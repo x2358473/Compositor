@@ -21,7 +21,7 @@ struct CanvasRulerCorner: View {
 }
 
 struct CanvasRulerView: NSViewRepresentable {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let axis: CanvasGuide.Axis
 
     func makeNSView(context: Context) -> CanvasRulerNSView {

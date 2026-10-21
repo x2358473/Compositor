@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TransformInspector: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var value: LayerTransform {
         session.transformEdit?.draft ?? session.activeLayer.map { session.editedTransform(for: $0) }
             ?? LayerTransform(origin: .zero, size: CGSize(width: 1, height: 1))

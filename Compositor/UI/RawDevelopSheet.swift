@@ -4,7 +4,7 @@ import SwiftUI
 /// than assumed. The preview develops at screen size while the sliders move; the import then
 /// develops the full frame once.
 struct RawDevelopSheet: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let url: URL
     @State private var settings: RawDevelopSettings
     @State private var preview: CGImage?
@@ -82,7 +82,7 @@ struct RawDevelopSheet: View {
     private func refreshPreview() async {
         // Just enough to coalesce a burst of slider changes; the render itself is nearly free once
         // the file's filter is warm (see RawImporter.Queue).
-        if revision > 0 { try? await Task.sleep(for: .milliseconds(60)) }
+        if revision > 0 { try? await Task.sleep(nanoseconds: 60_000_000) }
         guard !Task.isCancelled else { return }
         working = true
         defer { working = false }

@@ -59,7 +59,7 @@ nonisolated enum NewCanvasBackground: String, CaseIterable, Sendable {
 }
 
 struct NewCanvasSheet: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     var onCreate: ((Int, Int, Double, CGColor?) -> Void)? = nil
     var onOpen: (() -> Void)? = nil
     @State private var width = "1920"
@@ -119,7 +119,7 @@ struct NewCanvasSheet: View {
                             .contentShape(Rectangle())
                             .padding(.trailing, -10)
                     }
-                    .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+                    .menuStyle(.borderlessButton).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
                     .help("Preset sizes for screens and common formats".localized)
                     .accessibilityLabel("Preset sizes")
                 }

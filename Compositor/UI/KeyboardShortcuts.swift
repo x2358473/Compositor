@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import Combine
 
 struct ShortcutChord: Codable, Equatable, Hashable {
     var key: String
@@ -43,7 +44,8 @@ struct ShortcutChord: Codable, Equatable, Hashable {
     }
     /// A key equivalent as the list records it: SwiftUI's `.delete` (U+0008) is the Delete key, recorded as U+007F.
     static func recorded(_ key: KeyEquivalent) -> String {
-        key == .delete ? "\u{7f}" : String(key.character)
+        // Compare Characters, not KeyEquivalent itself: its Equatable conformance is macOS 14+.
+        key.character == "\u{8}" ? "\u{7f}" : String(key.character)
     }
     var cocoaModifiers: NSEvent.ModifierFlags {
         var flags: NSEvent.ModifierFlags = []
@@ -143,11 +145,11 @@ struct ShortcutDefinition: Identifiable {
     }()
 }
 
-@MainActor @Observable
-final class ShortcutSettings {
+@MainActor
+final class ShortcutSettings: ObservableObject {
     static let shared = ShortcutSettings()
-    private(set) var overrides: [String: ShortcutChord] = [:]
-    @ObservationIgnored private let panel = FloatingPanelController(name: "keyboardShortcuts")
+    @Published private(set) var overrides: [String: ShortcutChord] = [:]
+    private let panel = FloatingPanelController(name: "keyboardShortcuts")
     private static let storageKey = "keyboardShortcuts.v1"
     private let defaults: UserDefaults
     /// `defaults` is the app's own everywhere but tests, which use a throwaway suite.
@@ -250,14 +252,23 @@ final class ShortcutSettings {
 extension View {
     func configuredNativeShortcut(_ key: KeyEquivalent, modifiers: EventModifiers = []) -> some View {
         // nil when the person cleared it: no key at all.
-        keyboardShortcut(ShortcutSettings.shared.native(key, modifiers: modifiers).keyboardShortcut)
+        let chord = ShortcutSettings.shared.native(key, modifiers: modifiers)
+        guard let first = chord.key.first else { return keyboardShortcut(key, modifiers: modifiers) }
+        return keyboardShortcut(first == "\u{7f}" ? .delete : KeyEquivalent(first), modifiers: chord.eventModifiers)
     }
     func configuredKeyboardShortcut(_ key: KeyEquivalent, modifiers: EventModifiers = .command) -> some View {
-        keyboardShortcut(ShortcutSettings.shared.menu(key, modifiers: modifiers).keyboardShortcut)
+        let chord = ShortcutSettings.shared.menu(key, modifiers: modifiers)
+        guard let first = chord.key.first else { return keyboardShortcut(key, modifiers: modifiers) }
+        return keyboardShortcut(first == "\u{7f}" ? .delete : KeyEquivalent(first), modifiers: chord.eventModifiers)
     }
     /// For a menu item that ships without a key: the one the person gave it in Keyboard Shortcuts, if any.
+    @ViewBuilder
     func assignableShortcut(_ title: String) -> some View {
-        keyboardShortcut(ShortcutSettings.shared.assigned(title))
+        if let shortcut = ShortcutSettings.shared.assigned(title) {
+            keyboardShortcut(shortcut.key, modifiers: shortcut.modifiers)
+        } else {
+            self
+        }
     }
 }
 

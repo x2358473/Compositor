@@ -3,7 +3,7 @@ import SwiftUI
 
 /// Native mouse-down selection and drag tracking, without a double-click delay.
 struct NativeLayerList: NSViewRepresentable {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     func makeCoordinator() -> Coordinator { Coordinator(session: session) }
 
     func makeNSView(context: Context) -> NSScrollView {

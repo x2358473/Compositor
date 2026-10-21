@@ -5,24 +5,28 @@ import Sparkle
 @main
 struct CompositorApp: App {
     @NSApplicationDelegateAdaptor(CompositorApplicationDelegate.self) private var applicationDelegate
-    @AppStorage("navigator.visible") private var showsNavigator = false
-    private var session: EditorSession { applicationDelegate.session }
     var body: some Scene {
-        Window("Compositor", id: "editor") {
+        WindowGroup("Compositor", id: "editor") {
             ProjectWorkspaceView(applicationDelegate: applicationDelegate).roundedControls()
+                .frame(minWidth: 800, minHeight: 500)
         }
-            .defaultSize(width: 1180, height: 780)
             // Files opened from Finder or dropped on the Dock icon go to the app delegate, which imports them into
             // the open window. Left to SwiftUI, each one builds a throwaway window and fades the editor out and back.
             .handlesExternalEvents(matching: [])
-            // A first launch fills the screen (without going full screen); after that macOS reopens the window at the
-            // size it was left.
-            .defaultWindowPlacement { _, context in
-                WindowPlacement(size: context.defaultDisplay.visibleRect.size)
-            }
             // The project's name is already on its tab, so the toolbar doesn't repeat it as a window title.
             .windowToolbarStyle(.unifiedCompact(showsTitle: false))
-            .commands {
+            .commands { EditorCommands(applicationDelegate: applicationDelegate) }
+    }
+}
+
+struct EditorCommands: Commands {
+    // Observe changes at the Commands boundary rather than relying on the app delegate
+    // adaptor to invalidate menus when the workspace or its sessions change on Monterey.
+    @ObservedObject var applicationDelegate: CompositorApplicationDelegate
+    @AppStorage("navigator.visible") private var showsNavigator = false
+    private var session: EditorSession { applicationDelegate.session }
+
+    var body: some Commands {
                 CommandGroup(replacing: .undoRedo) {
                     // Dialog text fields keep native text undo; document history
                     // is unavailable while an import or modal edit is active.
@@ -79,6 +83,9 @@ struct CompositorApp: App {
                         .configuredKeyboardShortcut("s", modifiers: [.command, .shift])
                         .disabled(session.document == nil || !applicationDelegate.projects.canStart)
                     Divider()
+                    Button("Export PNG…".localized) { Task { await applicationDelegate.projects.exportPNG() } }
+                        .configuredKeyboardShortcut("e", modifiers: [.command, .shift])
+                        .disabled(session.document == nil || !applicationDelegate.projects.canStart)
                     // Export As on JPEG.
                     Button("Export JPEG…".localized) { Task { await applicationDelegate.projects.exportAs(start: .jpeg) } }
                         .configuredKeyboardShortcut("s", modifiers: [.command, .option, .shift])
@@ -221,10 +228,7 @@ struct CompositorApp: App {
                     Button("Copy Merged".localized) { session.copyMergedSelection() }
                         .configuredKeyboardShortcut("c", modifiers: [.command, .shift]).disabled(!session.canCopyMerged)
                     Button("Paste".localized) {
-                        // On the New canvas screen an image on the clipboard makes the canvas, even with a size field
-                        // being typed in; a size copied as text still goes into the field.
-                        if session.canPasteImageAsNewCanvas { Task { await session.pasteImageAsNewCanvas() } }
-                        else if NSApp.keyWindow?.firstResponder is NSTextView { NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: nil) }
+                        if NSApp.keyWindow?.firstResponder is NSTextView { NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: nil) }
                         else if applicationDelegate.workspace.pasteCopiedLayer() { }
                         else if session.canPaste { session.paste() }
                         else { NSSound.beep() }
@@ -392,7 +396,6 @@ struct CompositorApp: App {
                     }
                         .disabled(!session.canEditLayers || session.activeLayer == nil)
                 }
-            }
     }
 
     /// View › CMYK › Profile › Load Profile: a CMYK ICC profile picked from anywhere, kept and chosen.

@@ -1,6 +1,5 @@
 import Foundation
 import Metal
-import Synchronization
 
 /// The existing composed color table on Metal. Values close to an 8-bit rounding boundary are repaired by
 /// the CPU's double-precision lookup, so a precision difference cannot accumulate through later effects.
@@ -15,10 +14,15 @@ nonisolated final class MetalCameraRawLookup: Sendable {
         let uncertain: MTLBuffer
         let lookup: MTLBuffer
     }
-    private let buffers = Mutex<Buffers?>(nil)
+    private let buffersLock = NSLock()
+    private var _buffers: Buffers?
 
     /// Called on a worker when a Camera Raw session closes, so large scratch buffers don't remain resident.
-    func discardBuffers() { buffers.withLock { $0 = nil } }
+    func discardBuffers() {
+        buffersLock.lock()
+        defer { buffersLock.unlock() }
+        _buffers = nil
+    }
 
     private struct Parameters {
         var width: UInt32
@@ -47,37 +51,37 @@ nonisolated final class MetalCameraRawLookup: Sendable {
               table.withUnsafeBufferPointer({ camera_raw_lookup_is_valid($0.baseAddress, Int32(grid)) != 0 }) else { return false }
         let bytes = rowBytes * height
         guard bytes <= Int(UInt32.max), bytes <= device.maxBufferLength, width * height <= device.maxBufferLength else { return false }
-        return buffers.withLock { storage in
-            let lookupBytes = table.count * MemoryLayout<Float>.stride
-            if storage == nil || storage!.pixels.length < bytes || storage!.uncertain.length < width * height {
-                guard let input = device.makeBuffer(length: bytes, options: .storageModeShared),
-                      let uncertain = device.makeBuffer(length: width * height, options: .storageModeShared),
-                      let lookup = device.makeBuffer(length: lookupBytes, options: .storageModeShared) else { return false }
-                storage = Buffers(pixels: input, uncertain: uncertain, lookup: lookup)
-            }
-            guard let ready = storage, let command = queue.makeCommandBuffer(),
-                  let encoder = command.makeComputeCommandEncoder() else { return false }
-            memcpy(ready.pixels.contents(), pixels, bytes)
-            table.withUnsafeBytes { memcpy(ready.lookup.contents(), $0.baseAddress!, lookupBytes) }
-            var parameters = Parameters(width: UInt32(width), height: UInt32(height), rowBytes: UInt32(rowBytes), grid: UInt32(grid))
-            encoder.setComputePipelineState(pipeline)
-            for (index, buffer) in [ready.pixels, ready.uncertain, ready.lookup].enumerated() { encoder.setBuffer(buffer, offset: 0, index: index) }
-            encoder.setBytes(&parameters, length: MemoryLayout<Parameters>.stride, index: 3)
-            encoder.dispatchThreads(MTLSize(width: width, height: height, depth: 1),
-                                    threadsPerThreadgroup: MTLSize(width: 16, height: 16, depth: 1))
-            encoder.endEncoding()
-            command.commit()
-            command.waitUntilCompleted()
-            guard command.status == .completed else { return false }
-            let result = ready.pixels.contents().assumingMemoryBound(to: UInt8.self)
-            table.withUnsafeBufferPointer {
-                camera_raw_repair_lookup(result, pixels, ready.uncertain.contents().assumingMemoryBound(to: UInt8.self),
-                                         width, height, rowBytes, $0.baseAddress, Int32(grid))
-            }
-            // The pointwise kernel preserves row padding as well as alpha.
-            memcpy(pixels, result, bytes)
-            return true
+        buffersLock.lock()
+        defer { buffersLock.unlock() }
+        let lookupBytes = table.count * MemoryLayout<Float>.stride
+        if _buffers == nil || _buffers!.pixels.length < bytes || _buffers!.uncertain.length < width * height {
+            guard let input = device.makeBuffer(length: bytes, options: .storageModeShared),
+                  let uncertain = device.makeBuffer(length: width * height, options: .storageModeShared),
+                  let lookup = device.makeBuffer(length: lookupBytes, options: .storageModeShared) else { return false }
+            _buffers = Buffers(pixels: input, uncertain: uncertain, lookup: lookup)
         }
+        guard let ready = _buffers, let command = queue.makeCommandBuffer(),
+              let encoder = command.makeComputeCommandEncoder() else { return false }
+        memcpy(ready.pixels.contents(), pixels, bytes)
+        table.withUnsafeBytes { memcpy(ready.lookup.contents(), $0.baseAddress!, lookupBytes) }
+        var parameters = Parameters(width: UInt32(width), height: UInt32(height), rowBytes: UInt32(rowBytes), grid: UInt32(grid))
+        encoder.setComputePipelineState(pipeline)
+        for (index, buffer) in [ready.pixels, ready.uncertain, ready.lookup].enumerated() { encoder.setBuffer(buffer, offset: 0, index: index) }
+        encoder.setBytes(&parameters, length: MemoryLayout<Parameters>.stride, index: 3)
+        encoder.dispatchThreads(MTLSize(width: width, height: height, depth: 1),
+                                threadsPerThreadgroup: MTLSize(width: 16, height: 16, depth: 1))
+        encoder.endEncoding()
+        command.commit()
+        command.waitUntilCompleted()
+        guard command.status == .completed else { return false }
+        let result = ready.pixels.contents().assumingMemoryBound(to: UInt8.self)
+        table.withUnsafeBufferPointer {
+            camera_raw_repair_lookup(result, pixels, ready.uncertain.contents().assumingMemoryBound(to: UInt8.self),
+                                     width, height, rowBytes, $0.baseAddress, Int32(grid))
+        }
+        // The pointwise kernel preserves row padding as well as alpha.
+        memcpy(pixels, result, bytes)
+        return true
     }
 
     private static let source = """

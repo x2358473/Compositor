@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Select > Color Range's panel: the eyedroppers, Fuzziness and Invert, with the selection updating on the canvas.
 struct ColorRangeSheet: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var edit: ColorRangeEdit? { session.colorRange }
 
     var body: some View {

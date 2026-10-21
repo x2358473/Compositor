@@ -3,7 +3,7 @@ import SwiftUI
 struct CanvasSizeSheet: View {
     let foreground: PaletteColor
     let background: PaletteColor
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let finish: (CanvasSizeOptions?) -> Void
     @State private var draft: CanvasSizeDraft
     @State private var anchor = 4
