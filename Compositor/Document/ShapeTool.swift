@@ -51,6 +51,9 @@ nonisolated enum ShapeKind: String, CaseIterable, Codable, Sendable {
         path.closeSubpath()
         return path
     }
+
+    /// The localized name.
+    var localizedName: String { rawValue.localized }
 }
 
 /// What a shape layer draws, kept so the shape can be drawn again at a new size.
