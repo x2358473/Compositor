@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The open filter's panel: its settings, Preview, and Cancel / OK.
 struct FilterSheet: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var edit: FilterEdit? { session.filterEdit }
     private var settings: FilterSettings { edit?.settings ?? FilterSettings() }
     private func update(_ change: (inout FilterSettings) -> Void) {

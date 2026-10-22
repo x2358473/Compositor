@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct BlendModePicker: NSViewRepresentable {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     func makeCoordinator() -> Coordinator { Coordinator(session: session) }
     func makeNSView(context: Context) -> NSPopUpButton {
         let button = NSPopUpButton(frame: .zero, pullsDown: false)
@@ -20,11 +20,13 @@ struct BlendModePicker: NSViewRepresentable {
         button.action = #selector(Coordinator.choose(_:))
         button.setAccessibilityLabel("Blend mode".localized)
         // A capsule like the SwiftUI buttons and menus (`roundedControls`), which don't reach this AppKit pop-up.
-        button.borderShape = .capsule
+        button.bezelStyle = .rounded
         return button
     }
     /// As wide as it's offered. Left to itself, the pop-up insists on the width of its longest mode, wider than a
     /// narrow Layers panel has room for, and that pushed the whole panel out past its edges.
+    /// macOS 13+ sizes it; on macOS 12 the pop-up keeps its intrinsic width.
+    @available(macOS 13.0, *)
     func sizeThatFits(_ proposal: ProposedViewSize, nsView button: NSPopUpButton, context: Context) -> CGSize? {
         let natural = button.intrinsicContentSize
         guard let width = proposal.width, width.isFinite else { return natural }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LayersPanel: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     /// Dragging the panel's left edge sets it, within `widths`.
     var width: CGFloat = 252
     /// No narrower than the footer: its icons can't shrink, and a footer wider than the panel pushed everything in

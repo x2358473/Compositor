@@ -1,6 +1,6 @@
 import AppKit
 import CoreImage
-import Observation
+import Combine
 
 /// Filters from the Filter menu. Each runs on the active image layer, inside the selection if
 /// there is one, with a live preview and one undo step on OK.
@@ -477,101 +477,100 @@ nonisolated enum PixelFilter {
     }
 }
 
-@Observable
-final class FilterEdit {
+final class FilterEdit: ObservableObject {
     let kind: FilterKind
     /// Filter › Last Filter, applied straight away with the settings it had.
-    var repeating = false
+    @Published var repeating = false
     let layerID: UUID
     let original: ImportedImage
     let transform: LayerTransform
     let selection: SelectionClip?
-    var mapping: CGAffineTransform
-    var previewSource: CGImage
+    @Published var mapping: CGAffineTransform
+    @Published var previewSource: CGImage
     /// An HDR layer's pixels at the preview's size and grid, which its preview is made from, as OK makes the result from
     /// the layer's own: from `previewSource`, clipped to white, a blur or Exposure would preview something else.
-    var hdrPreviewSource: CGImage?
-    var previewScale: CGFloat
-    var previewMapping: CGAffineTransform
+    @Published var hdrPreviewSource: CGImage?
+    @Published var previewScale: CGFloat
+    @Published var previewMapping: CGAffineTransform
     /// A filter reaching past the layer's edge — Content-Aware Fill over a selection, a blur spreading outwards —
     /// works on the layer's pixels padded out, and on the transform placing that larger grid.
-    var grownImage: CGImage? = nil
-    var grownTransform: LayerTransform? = nil
+    @Published var grownImage: CGImage? = nil
+    @Published var grownTransform: LayerTransform? = nil
     /// Where the layer's own pixels sit within `grownImage`, so a 16-bit layer's pixels can be padded the same way.
-    var grownInside: CGRect? = nil
+    @Published var grownInside: CGRect? = nil
     /// How far the padding reaches beyond the layer on every side, in layer pixels.
-    var grownMargin: CGFloat = 0
+    @Published var grownMargin: CGFloat = 0
     /// The layer's sides at or past the canvas's edge, where Gaussian and Motion Blur carry its edge pixels on rather
     /// than spreading into clear ones: they're given no padding.
     private(set) var canvasSides: LayerSides = []
-    var settings: FilterSettings
-    var preview = true
-    var committing = false
-    var previewError: String?
-    var preparing = false
+    @Published var settings: FilterSettings
+    @Published var preview = true
+    @Published var committing = false
+    @Published var previewError: String?
+    @Published var preparing = false
     /// Add Noise's grain, fixed while the panel is open so changing Amount doesn't reshuffle it.
     let seed = UInt32.random(in: .min ... .max)
     /// Camera Raw panel eyes. Off drops that group's amounts from the preview and from OK, without clearing the sliders.
-    var showsCameraRawLight = true
-    var showsCameraRawColor = true
-    var showsCameraRawEffects = true
-    var showsCameraRawCurve = true
-    var showsCameraRawMixer = true
-    var showsCameraRawGrading = true
-    var showsCameraRawDetail = true
-    var showsCameraRawOptics = true
-    var showsCameraRawGeometry = true
-    var showsCameraRawCalibration = true
-    var cameraRawCurvePage: CameraRawCurvePage = .parametric
-    var cameraRawPointChannel: CameraRawPointChannel = .rgb
-    var cameraRawMixerPage: CameraRawMixerPage = .hsl
-    var cameraRawMixerTab: CameraRawMixerTab = .hue
-    var cameraRawMixerSwatch = 0
-    var cameraRawPointIndex = 0
-    var cameraRawGradePage: CameraRawGradePage = .threeWay
-    var targetsCameraRawCurve = false
-    var targetsCameraRawMixer = false
-    var samplesPointColor = false
-    var cameraRawDrag: CameraRawDrag?
+    @Published var showsCameraRawLight = true
+    @Published var showsCameraRawColor = true
+    @Published var showsCameraRawEffects = true
+    @Published var showsCameraRawCurve = true
+    @Published var showsCameraRawMixer = true
+    @Published var showsCameraRawGrading = true
+    @Published var showsCameraRawDetail = true
+    @Published var showsCameraRawOptics = true
+    @Published var showsCameraRawGeometry = true
+    @Published var showsCameraRawCalibration = true
+    @Published var cameraRawCurvePage: CameraRawCurvePage = .parametric
+    @Published var cameraRawPointChannel: CameraRawPointChannel = .rgb
+    @Published var cameraRawMixerPage: CameraRawMixerPage = .hsl
+    @Published var cameraRawMixerTab: CameraRawMixerTab = .hue
+    @Published var cameraRawMixerSwatch = 0
+    @Published var cameraRawPointIndex = 0
+    @Published var cameraRawGradePage: CameraRawGradePage = .threeWay
+    @Published var targetsCameraRawCurve = false
+    @Published var targetsCameraRawMixer = false
+    @Published var samplesPointColor = false
+    @Published var cameraRawDrag: CameraRawDrag?
     var pointColorVisualizeIndex: Int {
         let points = settings.cameraRaw.mixer.points
         guard points.indices.contains(cameraRawPointIndex), points[cameraRawPointIndex].visualize else { return -1 }
         return cameraRawPointIndex
     }
     /// White-balance eyedropper, armed from the Color section.
-    var samplesWhiteBalance = false
+    @Published var samplesWhiteBalance = false
     /// Defringe eyedropper, armed from Optics. Sets purple or green hue range from the clicked fringe.
-    var samplesDefringe = false
+    @Published var samplesDefringe = false
     /// Guided Upright: drag lines on the preview.
-    var drawingCameraRawGeometryGuide = false
-    var cameraRawGuideDraft: (start: CGPoint, end: CGPoint)?
+    @Published var drawingCameraRawGeometryGuide = false
+    @Published var cameraRawGuideDraft: (start: CGPoint, end: CGPoint)?
     /// Set while Option is held on Exposure, Highlights, Shadows, Whites, or Blacks.
-    var cameraRawClipping: CameraRawClipping?
+    @Published var cameraRawClipping: CameraRawClipping?
     /// Set while Option is held on Sharpening Masking.
-    var cameraRawSharpenMask = false
+    @Published var cameraRawSharpenMask = false
     /// Histogram clipping indicators. They paint the preview and are not baked in on OK.
-    var showsShadowClipping = false
-    var showsHighlightClipping = false
+    @Published var showsShadowClipping = false
+    @Published var showsHighlightClipping = false
     /// Histogram, or the vectorscope chosen from its context menu.
-    var cameraRawScopeMode: CameraRawScopeMode = .histogram
-    var cameraRawScope: CameraRawScope?
+    @Published var cameraRawScopeMode: CameraRawScopeMode = .histogram
+    @Published var cameraRawScope: CameraRawScope?
     /// RGB of the pixel under the pointer, in the adjusted preview.
-    var cameraRawReadout: (red: Int, green: Int, blue: Int)?
+    @Published var cameraRawReadout: (red: Int, green: Int, blue: Int)?
     /// Vignette on an empty layer: the canvas it frames and fills.
-    @ObservationIgnored var canvas: CGRect?
+    var canvas: CGRect?
     /// The layer had no pixels yet (an empty layer); the filter started it from clear ones.
-    @ObservationIgnored var startedEmpty = false
-    @ObservationIgnored var preparedPreview: CGImage?
+    var startedEmpty = false
+    var preparedPreview: CGImage?
     /// Where `preparedPreview` goes: the grown layer it was made from, or nil for the layer's own place. A blur grows
     /// the layer as it gets bigger; the last preview stays up where it belongs until the next one replaces it.
-    @ObservationIgnored var preparedTransform: LayerTransform?
+    var preparedTransform: LayerTransform?
     /// The grown layer `pending` is made from.
-    @ObservationIgnored var pendingTransform: LayerTransform?
+    var pendingTransform: LayerTransform?
     /// Reject a render started before the blur's padded pixel grid changed.
-    @ObservationIgnored var previewSourceVersion: UInt64 = 0
+    var previewSourceVersion: UInt64 = 0
     /// Camera Raw's adaptive sliders read the picture before any change, which stays the same while the panel is open:
     /// measured once from the preview's source, again only when that changes.
-    @ObservationIgnored private var cameraRawBrightness: (version: UInt64, value: CameraRawTables.Brightness)?
+    private var cameraRawBrightness: (version: UInt64, value: CameraRawTables.Brightness)?
     var previewBrightness: CameraRawTables.Brightness? {
         guard let cached = cameraRawBrightness, cached.version == previewSourceVersion else { return nil }
         return cached.value
@@ -580,9 +579,9 @@ final class FilterEdit {
         cameraRawBrightness = (previewSourceVersion, value)
     }
     /// The settings `preparedPreview` was made with, for the automatic filters that have settings of their own.
-    @ObservationIgnored var preparedSettings: FilterSettings?
-    @ObservationIgnored var pending: FilterJob?
-    @ObservationIgnored var previewTask: Task<Void, Never>?
+    var preparedSettings: FilterSettings?
+    var pending: FilterJob?
+    var previewTask: Task<Void, Never>?
     /// Previews render from a copy no larger than this on its longest side.
     static let previewLimit: CGFloat = 2048
 

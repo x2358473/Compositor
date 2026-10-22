@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import CoreImage
 
 /// The six color ranges plus Master, as in Photoshop's Cmd+U.
@@ -400,22 +401,21 @@ nonisolated enum HueSaturationFilter {
 /// One open Hue/Saturation dialog. Previews render from a downscaled copy of the original
 /// and are drawn straight on the canvas, so dragging stays responsive and the document is
 /// untouched until OK.
-@Observable
-final class HueSaturationEdit {
+final class HueSaturationEdit: ObservableObject {
     let layerID: UUID
     let original: ImportedImage
     let selection: SelectionClip?
     let pixelToDocument: CGAffineTransform
     /// Downscaled original used for previews, with the mapping for its own pixel grid.
-    @ObservationIgnored let previewSource: CGImage
+    let previewSource: CGImage
     /// An HDR layer's pixels at `previewSource`'s size: its preview is made from them, as OK makes the result.
-    @ObservationIgnored var hdrPreviewSource: CGImage?
-    @ObservationIgnored let previewPixelToDocument: CGAffineTransform
-    var settings = HueSaturationSettings()
-    var preview = true
+    var hdrPreviewSource: CGImage?
+    let previewPixelToDocument: CGAffineTransform
+    @Published var settings = HueSaturationSettings()
+    @Published var preview = true
     /// What the canvas shows while the dialog is open; nil means the layer's own pixels.
     /// Not observed: canvas redraws are driven by `brushRevision`.
-    @ObservationIgnored private(set) var preparedPreview: CGImage?
+    private(set) var preparedPreview: CGImage?
 
     /// Previews render at most this many pixels on the longest side: full size for anything ordinary, so the canvas
     /// shows the real thing rather than a coarse copy stretched to fit, as a Hue/Saturation layer already does.

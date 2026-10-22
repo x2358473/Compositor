@@ -5,9 +5,8 @@ struct ContentView: View {
     /// The Layers panel's width, remembered across launches.
     @AppStorage("layersPanelWidth") private var layersPanelWidth = 252.0
     @AppStorage("navigator.visible") private var showsNavigator = false
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     var applicationDelegate: CompositorApplicationDelegate? = nil
-    @Environment(\.openWindow) private var openWindow
     @State private var canvasFrame: CGRect = .zero
     @State private var levelsPanel = FloatingPanelController(name: "levelsPanel")
     @State private var adjustmentPanel = FloatingPanelController(name: "adjustmentPanel")
@@ -175,7 +174,7 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
         }
-        .onAppear { applicationDelegate?.showEditor = { openWindow(id: "editor") } }
+        .onAppear { applicationDelegate?.showEditor = { CompositorApplicationDelegate.reopen() } }
         .preferredColorScheme(.dark)
         // Canvas Only (F): the canvas runs up under where the title bar was, so no gray strip is left across the top.
         // The toolbar itself is hidden and shown by the window (see `toggleCanvasOnly`), which lays its buttons out
@@ -189,20 +188,19 @@ struct ContentView: View {
                     .disabled(session.isImporting || session.showsBusy || session.levels != nil)
                     .modifier(NewProjectDropTarget(workspace: applicationDelegate?.workspace))
             }
-            ToolbarSpacer(.fixed, placement: .navigation)
-            if let workspace = applicationDelegate?.workspace {
-                ToolbarItem(placement: .navigation) {
+            ToolbarItem(placement: .navigation) { Spacer().frame(width: 8) }
+            ToolbarItem(placement: .navigation) {
+                if let workspace = applicationDelegate?.workspace {
                     ProjectTabStrip(workspace: workspace)
                         // As wide as the toolbar allows: the window less the traffic lights and New button before it
                         // and the zoom controls after it. Bounded, so adding tabs never pushes those aside; the
                         // strip scrolls instead.
                         .frame(width: max(200, windowWidth - 352), height: 34, alignment: .center)
                 }
-                .sharedBackgroundVisibility(.hidden)
             }
             // Absorb all remaining navigation-toolbar width before the zoom controls.
             // Without this spacer, the growing tab strip pushes the primary actions left.
-            ToolbarSpacer(.flexible, placement: .navigation)
+            ToolbarItem(placement: .navigation) { Spacer() }
             ToolbarItem(placement: .primaryAction) {
                 Button("Fit".localized) { session.fit() }.help("Fit canvas in window (⌘0)".localized)
                     .accessibilityIdentifier("fitCanvas").disabled(session.document == nil)
@@ -450,7 +448,7 @@ private struct PanelResizeEdge: View {
     var body: some View {
         Divider().overlay {
             Color.clear.frame(width: 8).contentShape(Rectangle())
-                .pointerStyle(.columnResize)
+                .onHover { inside in if inside { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
                 .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global)
                     .onChanged { value in
                         let start = startWidth ?? width
@@ -466,7 +464,10 @@ private struct PanelResizeEdge: View {
 extension View {
     /// Bordered buttons and pop-up menus drawn as capsules throughout the app. Borderless and plain buttons (the tool
     /// rail, the Layers panel footer) have no border to shape, so they're unaffected.
-    func roundedControls() -> some View { buttonBorderShape(.capsule) }
+    @ViewBuilder func roundedControls() -> some View {
+        if #available(macOS 14, *) { buttonBorderShape(.capsule) }
+        else { buttonBorderShape(.roundedRectangle) }
+    }
 }
 
 extension View {

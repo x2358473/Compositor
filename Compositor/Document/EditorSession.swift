@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import UniformTypeIdentifiers
 
 struct ImageLayer: Identifiable, Equatable {
@@ -98,7 +99,13 @@ enum NavigationTool: String, CaseIterable {
     var isBrushTool: Bool { self == .brush || self == .spotHealing || self == .cloneStamp || self == .blur }
     /// Tools that draw and edit selections, sharing modifiers, moving, and nudging.
     var isSelectionTool: Bool { self == .marquee || self == .lasso || self == .wand }
-    var symbol: String { self == .type ? "textformat" : self == .eyedropper ? "eyedropper" : self == .marquee ? "rectangle.dashed" : self == .lasso ? "lasso" : self == .wand ? "wand.and.stars" : self == .brush ? "paintbrush.pointed" : self == .spotHealing ? "bandage" : self == .cloneStamp ? "seal" : self == .blur ? "drop" : self == .gradient ? "square.bottomhalf.filled" : self == .shape ? "square.on.circle" : self == .pen ? "point.bottomleft.forward.to.point.topright.scurvepath" : self == .crop ? "crop" : self == .move ? "arrow.up.left.and.arrow.down.right" : self == .hand ? "hand.draw" : "magnifyingglass" }
+    var symbol: String {
+        if self == .pen {
+            if #available(macOS 14.0, *) { return "point.bottomleft.forward.to.point.topright.scurvepath" }
+            return "point.topleft.down.curvedto.point.bottomright.up"
+        }
+        return self == .type ? "textformat" : self == .eyedropper ? "eyedropper" : self == .marquee ? "rectangle.dashed" : self == .lasso ? "lasso" : self == .wand ? "wand.and.stars" : self == .brush ? "paintbrush.pointed" : self == .spotHealing ? "bandage" : self == .cloneStamp ? "seal" : self == .blur ? "drop" : self == .gradient ? "square.bottomhalf.filled" : self == .shape ? "square.on.circle" : self == .pen ? "point.bottomleft.forward.to.point.topright.scurvepath" : self == .crop ? "crop" : self == .move ? "arrow.up.left.and.arrow.down.right" : self == .hand ? "hand.draw" : "magnifyingglass"
+    }
     var label: String {
         switch self {
         case .type: return NSLocalizedString("Type (T)", comment: "")
@@ -121,24 +128,32 @@ enum NavigationTool: String, CaseIterable {
     }
 }
 
-@Observable
-final class EditorSession {
+final class EditorSession: ObservableObject {
+    private var childChanges: [String: AnyCancellable] = [:]
+    init() {
+        observe(history, as: "history")
+        observe(HeldModifiers.shared, as: "modifiers")
+        observe(ShortcutSettings.shared, as: "shortcuts")
+    }
+    private func observe<T: ObservableObject>(_ child: T?, as key: String) where T.ObjectWillChangePublisher == ObservableObjectPublisher {
+        childChanges[key] = child?.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+    }
     var skipsInitialClipboardCanvasSize = false
-    var document: CanvasDocument?
-    var canvasFocusRequest = 0
-    var showsSampleRing = true
-    var adjustmentOriginal: LayerAdjustment?
-    var adjustmentEditingID: UUID? { didSet { resumeFileRequests() } }
+    @Published var document: CanvasDocument?
+    @Published var canvasFocusRequest = 0
+    @Published var showsSampleRing = true
+    @Published var adjustmentOriginal: LayerAdjustment?
+    @Published var adjustmentEditingID: UUID? { didSet { resumeFileRequests() } }
     /// The layer whose effects panel is open.
-    var effectsEditing: LayerEffectSelection?
-    var effectsEditingOriginal: LayerEffects?
-    var effectSelection: LayerEffectSelection?
-    @ObservationIgnored var effectsPreviews = EffectsPreviewCache()
-    var projectURL: URL?
+    @Published var effectsEditing: LayerEffectSelection?
+    @Published var effectsEditingOriginal: LayerEffects?
+    @Published var effectSelection: LayerEffectSelection?
+    var effectsPreviews = EffectsPreviewCache()
+    @Published var projectURL: URL?
     /// Blocks overlapping edits immediately. Not observed by the UI: controls only dim via
     /// `showsBusy`, after an operation has run long enough to be worth showing, so quick
     /// edits (invert, fills, stroke commits) never flash the interface.
-    @ObservationIgnored var isProjectBusy = false {
+    var isProjectBusy = false {
         didSet {
             if !isProjectBusy {
                 let waiters = projectWaiters
@@ -150,14 +165,14 @@ final class EditorSession {
         }
     }
     /// True once `isProjectBusy` has lasted longer than `busyIndicatorDelay`.
-    private(set) var showsBusy = false
-    static let busyIndicatorDelay: Duration = .milliseconds(250)
-    @ObservationIgnored private var busyIndicatorTask: Task<Void, Never>?
+    @Published private(set) var showsBusy = false
+    static let busyIndicatorDelay: UInt64 = 250_000_000 // Nanoseconds; Task.sleep(for:) requires macOS 13.
+    private var busyIndicatorTask: Task<Void, Never>?
     private func updateBusyIndicator() {
         if isProjectBusy {
             guard busyIndicatorTask == nil, !showsBusy else { return }
             busyIndicatorTask = Task { @MainActor [weak self] in
-                try? await Task.sleep(for: Self.busyIndicatorDelay)
+                try? await Task.sleep(nanoseconds: Self.busyIndicatorDelay)
                 guard let self, !Task.isCancelled, self.isProjectBusy else { return }
                 self.showsBusy = true
                 self.busyIndicatorTask = nil
@@ -190,17 +205,17 @@ final class EditorSession {
             await withCheckedContinuation { projectWaiters.append($0) }
         }
     }
-    var viewport = CanvasViewport()
-    var tool: NavigationTool = .move
-    var collapsedGroupIDs: Set<UUID> = []
-    var cropRect: CGRect?
-    var cropRatioChoice = "Free"
-    var cropError: String?
-    var transformEdit: TransformEdit?
-    @ObservationIgnored var distortPreviewCache: [UUID: DistortPreviewCache] = [:]
-    @ObservationIgnored var distortEffectsCache: [UUID: DistortEffectsCache] = [:]
+    @Published var viewport = CanvasViewport()
+    @Published var tool: NavigationTool = .move
+    @Published var collapsedGroupIDs: Set<UUID> = []
+    @Published var cropRect: CGRect?
+    @Published var cropRatioChoice = "Free"
+    @Published var cropError: String?
+    @Published var transformEdit: TransformEdit?
+    var distortPreviewCache: [UUID: DistortPreviewCache] = [:]
+    var distortEffectsCache: [UUID: DistortEffectsCache] = [:]
     /// Document positions a move has just snapped to, drawn as guides while it lasts.
-    @ObservationIgnored var snapGuides: (xs: [CGFloat], ys: [CGFloat]) = ([], [])
+    var snapGuides: (xs: [CGFloat], ys: [CGFloat]) = ([], [])
     /// Crop, resize and selection moves follow View › Snap (⇧⌘;) too: they had a Snap item of their own, which left
     /// the View menu with two called Snap.
     var snappingEnabled: Bool {
@@ -208,16 +223,16 @@ final class EditorSession {
         set { snapEnabled = newValue }
     }
     /// Where the last brush stroke ended, so a Shift-click paints a straight line on from it.
-    @ObservationIgnored var lastBrushPoint: (point: CGPoint, layerID: UUID, mask: Bool)?
+    var lastBrushPoint: (point: CGPoint, layerID: UUID, mask: Bool)?
     /// Where the brush is while Smoothing trails it behind the pointer (see `smoothed`).
-    @ObservationIgnored var brushAnchor: CGPoint?
+    var brushAnchor: CGPoint?
     /// The pointer itself, so a smoothed stroke can catch up to it when the button is released.
-    @ObservationIgnored var brushPointer: CGPoint?
+    var brushPointer: CGPoint?
     /// The pen's latest pressure in this stroke; 1 for a mouse. Events that carry none (the release) keep it.
-    @ObservationIgnored var brushPressure: CGFloat = 1
-    @ObservationIgnored var maskDistortPreviewCache: MaskDistortPreviewCache?
+    var brushPressure: CGFloat = 1
+    var maskDistortPreviewCache: MaskDistortPreviewCache?
     /// The last rounded rectangle drawn for a transform in progress, by layer, with the size it was drawn at.
-    @ObservationIgnored var shapeTransformPreviewCache: [UUID: (size: CGSize, image: CGImage)] = [:]
+    var shapeTransformPreviewCache: [UUID: (size: CGSize, image: CGImage)] = [:]
     var locksTransformRatio = true
     /// Off by default: a Move-tool press drags the active layer; hold Cmd (or turn this on) to pick the layer under the pointer.
     var transformAutoSelect = ToolDefaults.bool("autoSelect", false) { didSet { ToolDefaults.set(transformAutoSelect, "autoSelect") } }
@@ -225,96 +240,96 @@ final class EditorSession {
     /// a pending ⌘T transform still shows its box.
     var showsTransformControls = ToolDefaults.bool("transformControls", true) { didSet { ToolDefaults.set(showsTransformControls, "transformControls") } }
     /// The copies an Option-drag made, and what was selected before it, so Escape can take them away again.
-    @ObservationIgnored var transformDuplicate: (copies: [UUID], source: Set<UUID>, primary: UUID?)?
+    var transformDuplicate: (copies: [UUID], source: Set<UUID>, primary: UUID?)?
     var brushSettings = BrushSettings() { didSet { refreshGradient() } }
-    var spotHealingMode: SpotHealingMode = .contentAware
-    var blurMode: BlurToolMode = .liquify
+    @Published var spotHealingMode: SpotHealingMode = .contentAware
+    @Published var blurMode: BlurToolMode = .liquify
     /// The Brush's two modes: Paint lays down the foreground color, Erase clears pixels away (B and E).
-    var brushMode: BrushToolMode = .paint
+    @Published var brushMode: BrushToolMode = .paint
     /// The tool rail's icon, which follows the mode a tool is in.
     func symbol(for tool: NavigationTool) -> String {
         tool == .brush && brushMode == .erase ? "eraser" : tool.symbol
     }
     /// The Magic tool's two modes: Wand selects by color, Object traces the object under the pointer (Tab).
-    var wandMode: WandMode = .wand
+    @Published var wandMode: WandMode = .wand
     /// Clone Stamp: the source Option-click set (document pixels), its options, and — once a
     /// stroke has started — the offset from brush to source that aligned strokes keep.
-    var cloneSource: CGPoint?
+    @Published var cloneSource: CGPoint?
     var cloneSettings = CloneSettings()
     /// The brush tip (size, hardness, opacity) of the side not in use: Clone Stamp keeps its own,
     /// soft by default, while Brush and Spot Healing share theirs.
     /// The tips of the brush families not in use: Clone Stamp and Smear each keep their own size, hardness and
     /// opacity (both starting soft); the other brushes share one.
-    @ObservationIgnored var parkedBrushTips: [Int: (diameter: CGFloat, hardness: CGFloat, opacity: CGFloat)] = [1: (40, 0, 1), 2: (40, 0, 1)]
+    var parkedBrushTips: [Int: (diameter: CGFloat, hardness: CGFloat, opacity: CGFloat)] = [1: (40, 0, 1), 2: (40, 0, 1)]
     private static func tipFamily(_ tool: NavigationTool) -> Int { tool == .cloneStamp ? 1 : tool == .blur ? 2 : 0 }
-    @ObservationIgnored var cloneOffset: CGSize?
+    var cloneOffset: CGSize?
     var maskPaintWhite = false { didSet { refreshGradient() } }
     var backgroundColor = PaletteColor.white { didSet { refreshGradient() } }
     var gradientSettings = GradientSettings() { didSet { refreshGradient() } }
-    var gradientEdit: GradientEdit?
-    var lassoDraft: LassoDraft?
+    @Published var gradientEdit: GradientEdit?
+    @Published var lassoDraft: LassoDraft?
     var lassoKind = LassoKind.freehand
     var marqueeKind = LassoKind.rectangle
-    var textDraft: TextDraft? { didSet { if oldValue != nil && textDraft == nil { resumeFileRequests() } } }
+    @Published var textDraft: TextDraft? { didSet { if oldValue != nil && textDraft == nil { resumeFileRequests() } } }
     var textDefaults = LayerTextStyle()
     var shapeKind = ShapeKind.rectangle
     /// Corner radius in pixels for rectangles the Shape tool draws; 0 keeps the corners square.
-    var shapeCornerRadius: Double = 0
+    @Published var shapeCornerRadius: Double = 0
     var shapeSmoothing = false
     /// A Line shape's thickness in document pixels.
-    var shapeLineWidth: Double = 4
+    @Published var shapeLineWidth: Double = 4
     /// A Line shape's dash pattern and the finish on its ends (and on each dash).
     var shapeLineStyle = ShapeLineStyle.solid
     var shapeLineCap = ShapeLineCap.square
     /// The shape being dragged out with the Shape tool, before it becomes a layer.
-    var shapeDraft: ShapeDraft?
+    @Published var shapeDraft: ShapeDraft?
     var penAction = PenAction.draw
     /// The path being drawn before it becomes a layer.
     var penDraft: PenDraft? { didSet { if oldValue != nil && penDraft == nil { resumeFileRequests() } } }
     var selectedPenNodeIndex: Int?
     var selectedPenHandle: PenHandle?
-    @ObservationIgnored var penClosureUndo: PenClosureUndo?
-    @ObservationIgnored var penLineGestureActive = false
-    @ObservationIgnored var penLineGestureHandle: PenHandle?
+    var penClosureUndo: PenClosureUndo?
+    var penLineGestureActive = false
+    var penLineGestureHandle: PenHandle?
     /// Where a dragged path point started, for Shift-constrained moves.
-    @ObservationIgnored var penLineGestureOrigin: CGPoint?
+    var penLineGestureOrigin: CGPoint?
     /// Whether the current point, handle or bend gesture has changed the path.
-    @ObservationIgnored var penLineGestureChanged = false
-    @ObservationIgnored var penBendGesture: PenBendGesture?
-    @ObservationIgnored var penEraseGesture: PenEraseGesture?
+    var penLineGestureChanged = false
+    var penBendGesture: PenBendGesture?
+    var penEraseGesture: PenEraseGesture?
     var selectionModeChoice = SelectionMode.replace
     /// Mode implied by the Shift/Option keys currently held, nil when neither is.
-    var heldSelectionMode: SelectionMode?
+    @Published var heldSelectionMode: SelectionMode?
     /// The selection as it was when a drag-move began; the drag is one undo step.
-    @ObservationIgnored var selectionMoveOrigin: DocumentSelection?
-    var pixelMove: PixelMove?
-    @ObservationIgnored var pixelClipboard: PixelClipboard?
-    @ObservationIgnored var copiedLayer: CopiedLayer?
-    var levels: LevelsEdit? { didSet { resumeFileRequests() } }
-    var hueSaturation: HueSaturationEdit?
+    var selectionMoveOrigin: DocumentSelection?
+    @Published var pixelMove: PixelMove?
+    var pixelClipboard: PixelClipboard?
+    var copiedLayer: CopiedLayer?
+    @Published var levels: LevelsEdit? { didSet { observe(levels, as: "levels"); resumeFileRequests() } }
+    @Published var hueSaturation: HueSaturationEdit? { didSet { observe(hueSaturation, as: "hueSaturation") } }
     /// The open filter (Filter menu), and the settings the next one starts from.
-    var filterEdit: FilterEdit?
+    @Published var filterEdit: FilterEdit? { didSet { observe(filterEdit, as: "filter") } }
     var filterSettings = FilterSettings()
     /// What Filter › Last Filter runs again.
-    var lastFilter: FilterKind?
-    @ObservationIgnored var hueSaturationTask: Task<Void, Never>?
+    @Published var lastFilter: FilterKind?
+    var hueSaturationTask: Task<Void, Never>?
     /// The newest preview request while one is already rendering.
-    @ObservationIgnored var hueSaturationPending: HueSaturationJob?
+    var hueSaturationPending: HueSaturationJob?
     /// The armed eyedropper and the targeted-adjustment tool, while the panel is open.
-    var hueSampleMode: HueSampleMode?
+    @Published var hueSampleMode: HueSampleMode?
     var hueTargeting = false
-    @ObservationIgnored var hueTargetDrag: HueTargetDrag?
+    var hueTargetDrag: HueTargetDrag?
     var selectionAntialiased = true
     /// How far Feather softens the selection's edge each time it is applied, in document pixels.
-    var selectionAmountOperation: SelectionAmountOperation? { didSet { resumeFileRequests() } }
+    @Published var selectionAmountOperation: SelectionAmountOperation? { didSet { resumeFileRequests() } }
     /// Select > Color Range's panel is open; the selection shown is its preview until OK.
-    var colorRange: ColorRangeEdit? { didSet { resumeFileRequests() } }
+    @Published var colorRange: ColorRangeEdit? { didSet { observe(colorRange, as: "colorRange"); resumeFileRequests() } }
     /// The dialog whose color the picker is open on (`ColorPickerTarget.dialog`).
-    @ObservationIgnored var dialogColorChange: ((PaletteColor) -> Void)?
+    var dialogColorChange: ((PaletteColor) -> Void)?
     /// A dialog with its own zoomable preview (Export JPEG) is open: the View menu's zoom commands zoom that instead.
-    @ObservationIgnored var previewZoom: ((PreviewZoomCommand) -> Void)?
+    var previewZoom: ((PreviewZoomCommand) -> Void)?
     /// The text's style before the font menu started previewing faces on it (see `previewFont`).
-    @ObservationIgnored var fontPreviewOriginal: LayerTextStyle?
+    var fontPreviewOriginal: LayerTextStyle?
     var selectionFeatherAmount = 2
     var wandSettings = WandSettings()
     var objectSelectionSettings = ObjectSelectionSettings()
@@ -325,7 +340,7 @@ final class EditorSession {
     /// own colors.
     var showsGamutWarning = false { didSet { if showsGamutWarning, proofProfile == nil { proofProfile = CMYK.chosen }; brushRevision += 1 } }
     /// The CMYK profile proofing and CMYK export use, as View › CMYK › Profile last set it.
-    var proofProfile: CMYKProfile? { didSet { CMYK.chosen = proofProfile; brushRevision += 1 } }
+    @Published var proofProfile: CMYKProfile? { didSet { CMYK.chosen = proofProfile; brushRevision += 1 } }
     /// Layout grid (View > Show > Grid). Off until turned on; independent of the 800% pixel grid.
     var showsGrid = ToolDefaults.bool("grid", false) { didSet { ToolDefaults.set(showsGrid, "grid") } }
     /// The layout grid's spacing and subdivisions (View > Grid Settings…). The person's, not the project's.
@@ -349,9 +364,9 @@ final class EditorSession {
         }
     }
     /// User guides. Hidden extras do not snap.
-    var showsGuides = ToolDefaults.bool("guides", true) { didSet { ToolDefaults.set(showsGuides, "guides") } }
+    @Published var showsGuides = ToolDefaults.bool("guides", true) { didSet { ToolDefaults.set(showsGuides, "guides") } }
     /// F: the canvas alone on black, filling the screen, with every panel and bar put away. F again brings them back.
-    var canvasOnly = false
+    @Published var canvasOnly = false
     /// Nothing in progress for Escape to cancel (a transform, crop, lasso, shape, gradient, stroke or text), so in
     /// fullscreen it leaves fullscreen instead.
     var escapeHasNothingToCancel: Bool {
@@ -366,33 +381,33 @@ final class EditorSession {
             && colorPicker == nil && adjustmentEditingID == nil && effectsEditing == nil && colorRange == nil
             && selectionAmountOperation == nil
     }
-    var showsRulers = ToolDefaults.bool("rulers", false) { didSet { ToolDefaults.set(showsRulers, "rulers") } }
+    @Published var showsRulers = ToolDefaults.bool("rulers", false) { didSet { ToolDefaults.set(showsRulers, "rulers") } }
     /// Master snap switch (View > Snap). On so today's layer/canvas snap keeps working.
-    var snapEnabled = ToolDefaults.bool("snap", true) {
+    @Published var snapEnabled = ToolDefaults.bool("snap", true) {
         didSet {
             ToolDefaults.set(snapEnabled, "snap")
             if !snapEnabled { snapGuides = ([], []) }
             refreshCanvasPreview?()
         }
     }
-    var snapToGuides = ToolDefaults.bool("snapGuides", true) { didSet { ToolDefaults.set(snapToGuides, "snapGuides") } }
-    var snapToGrid = ToolDefaults.bool("snapGrid", false) { didSet { ToolDefaults.set(snapToGrid, "snapGrid") } }
-    var snapToLayers = ToolDefaults.bool("snapLayers", true) { didSet { ToolDefaults.set(snapToLayers, "snapLayers") } }
-    var snapToDocumentBounds = ToolDefaults.bool("snapBounds", true) { didSet { ToolDefaults.set(snapToDocumentBounds, "snapBounds") } }
-    var locksGuides = ToolDefaults.bool("lockGuides", false) { didSet { ToolDefaults.set(locksGuides, "lockGuides") } }
-    var guideDrag: GuideDrag?
+    @Published var snapToGuides = ToolDefaults.bool("snapGuides", true) { didSet { ToolDefaults.set(snapToGuides, "snapGuides") } }
+    @Published var snapToGrid = ToolDefaults.bool("snapGrid", false) { didSet { ToolDefaults.set(snapToGrid, "snapGrid") } }
+    @Published var snapToLayers = ToolDefaults.bool("snapLayers", true) { didSet { ToolDefaults.set(snapToLayers, "snapLayers") } }
+    @Published var snapToDocumentBounds = ToolDefaults.bool("snapBounds", true) { didSet { ToolDefaults.set(snapToDocumentBounds, "snapBounds") } }
+    @Published var locksGuides = ToolDefaults.bool("lockGuides", false) { didSet { ToolDefaults.set(locksGuides, "lockGuides") } }
+    @Published var guideDrag: GuideDrag?
     /// Pixels the Expand / Contract buttons grow or shrink the selection by.
-    var selectionExpandAmount = 1
-    var selectionContractAmount = 1
-    @ObservationIgnored var pendingOpacityDigit: (digit: Int, time: TimeInterval)?
-    var colorPicker: ColorPickerState?
-    var brushError: String?
-    var brushRevision = 0
+    @Published var selectionExpandAmount = 1
+    @Published var selectionContractAmount = 1
+    var pendingOpacityDigit: (digit: Int, time: TimeInterval)?
+    @Published var colorPicker: ColorPickerState? { didSet { observe(colorPicker, as: "colorPicker") } }
+    @Published var brushError: String?
+    @Published var brushRevision = 0
     /// Not observed by the UI, so controls don't dim for the length of every stroke;
     /// a stroke keeps the settings it started with, so edits made mid-stroke are harmless.
-    @ObservationIgnored var brushStroke: BrushStroke? { didSet { resumeFileRequests() } }
+    var brushStroke: BrushStroke? { didSet { resumeFileRequests() } }
     /// A Smudge or Liquify stroke in progress.
-    @ObservationIgnored var warpStroke: WarpStroke? { didSet { resumeFileRequests() } }
+    var warpStroke: WarpStroke? { didSet { resumeFileRequests() } }
 
     var canTransform: Bool {
         guard canEditLayers else { return false }
@@ -623,25 +638,26 @@ final class EditorSession {
         if let corners = transformEdit?.corners { previewCorners(corners.map { CGPoint(x: $0.x + dx, y: $0.y + dy) }) }
         if !alreadyEditing { commitTransform() }
     }
-    var showsNewDocument = false { didSet { resumeFileRequests() } }
-    var showsImporter = false { didSet { resumeFileRequests() } }
-    var isImporting = false { didSet { resumeFileRequests() } }
-    var importError: String? { didSet { resumeFileRequests() } }
-    var showsConversionSheet = false { didSet { resumeFileRequests() } }
-    var conversionRequest: PSDConversionRequest?
-    /// Tests assign this to skip the conversion sheet.
-    @ObservationIgnored var confirmConversions: (([PSDConversion]) async -> Bool)?
+    @Published var showsNewDocument = false { didSet { resumeFileRequests() } }
+    @Published var showsImporter = false { didSet { resumeFileRequests() } }
+    @Published var isImporting = false { didSet { resumeFileRequests() } }
+    @Published var importError: String? { didSet { resumeFileRequests() } }
+    @Published var showsConversionSheet = false { didSet { resumeFileRequests() } }
+    @Published var conversionRequest: PSDConversionRequest?
+    /// Tests assign this to skip the conversion sheet. Explicit actor isolation also keeps the stored
+    /// function's metadata compatible with macOS 12 when Combine reflects this session's fields.
+    var confirmConversions: (@MainActor ([PSDConversion]) async -> Bool)?
     /// The RAW file being developed, and the settings the sheet is editing (see RawImporter).
-    var rawDevelop: (url: URL, settings: RawDevelopSettings)?
-    var showsRawDevelop = false { didSet { resumeFileRequests() } }
+    @Published var rawDevelop: (url: URL, settings: RawDevelopSettings)?
+    @Published var showsRawDevelop = false { didSet { resumeFileRequests() } }
     /// Import was pressed and the full frame is developing: the sheet stays up, showing that, until the layer is in.
-    var rawImporting = false
+    @Published var rawImporting = false
     /// Camera Raw… was pressed: once the import is done, the Camera Raw Filter opens on the RAW's layer.
-    @ObservationIgnored private var rawOpensCameraRaw = false
-    @ObservationIgnored private var cameraRawAfterImport: UUID?
-    @ObservationIgnored private var rawContinuation: CheckedContinuation<RawDevelopSettings?, Never>?
+    private var rawOpensCameraRaw = false
+    private var cameraRawAfterImport: UUID?
+    private var rawContinuation: CheckedContinuation<RawDevelopSettings?, Never>?
     /// Tests assign this to develop without a sheet.
-    @ObservationIgnored var confirmRawDevelop: ((URL, RawDevelopSettings) async -> RawDevelopSettings?)?
+    var confirmRawDevelop: (@MainActor (URL, RawDevelopSettings) async -> RawDevelopSettings?)?
 
     /// Puts the develop sheet up and waits for the choice; nil means the import was cancelled.
     func developRaw(_ url: URL) async -> RawDevelopSettings? {
@@ -668,23 +684,23 @@ final class EditorSession {
         rawDevelop = nil
         Task { await RawImporter.Queue.shared.release() }
     }
-    @ObservationIgnored private var conversionContinuation: CheckedContinuation<Bool, Never>?
+    private var conversionContinuation: CheckedContinuation<Bool, Never>?
     /// Cancel pressed while a Photoshop file was still being read.
-    @ObservationIgnored private var conversionCancelled = false
-    var opacityEditLayerID: UUID?
-    var blendPreview: (layerID: UUID, mode: LayerBlendMode)?
-    @ObservationIgnored var refreshCanvasPreview: (() -> Void)?
-    var isMaskSelected = false { didSet { if !isMaskSelected { viewsMaskAlone = false } } }
+    private var conversionCancelled = false
+    @Published var opacityEditLayerID: UUID?
+    @Published var blendPreview: (layerID: UUID, mode: LayerBlendMode)?
+    var refreshCanvasPreview: (() -> Void)?
+    @Published var isMaskSelected = false { didSet { if !isMaskSelected { viewsMaskAlone = false } } }
     /// Option-click on a mask thumbnail: the canvas shows the targeted mask by itself, in grayscale, so it can be
     /// painted with nothing else in the way, as in Photoshop. Targeting the layer's pixels, or another layer, ends it.
-    var viewsMaskAlone = false
+    @Published var viewsMaskAlone = false
     /// The layer whose mask the canvas is showing by itself; nil for the ordinary composite.
     var maskAloneLayer: ImageLayer? {
         guard viewsMaskAlone, isMaskSelected, let layer = activeLayer, layer.mask != nil else { return nil }
         return layer
     }
-    var selectedLayerIDs: Set<UUID> = []
-    var activeLayerID: UUID? {
+    @Published var selectedLayerIDs: Set<UUID> = []
+    @Published var activeLayerID: UUID? {
         didSet {
             if activeLayerID != oldValue {
                 isMaskSelected = false
@@ -694,7 +710,7 @@ final class EditorSession {
             selectedLayerIDs = activeLayerID.map { [$0] } ?? []
         }
     }
-    var renamingLayerID: UUID? { didSet { resumeFileRequests() } }
+    @Published var renamingLayerID: UUID? { didSet { resumeFileRequests() } }
     let history = DocumentHistory()
     var isModified: Bool { history.isModified }
     var canUseHistory: Bool {
@@ -1094,7 +1110,7 @@ final class EditorSession {
 
     /// Opens each artboard of a Photoshop file as a document of its own; set by the workspace, which makes the tabs.
     /// Without it (no workspace), a file with artboards imports as one canvas, as one without them does.
-    @ObservationIgnored var opensArtboard: ((PSDDocument, String) async -> Void)?
+    var opensArtboard: ((PSDDocument, String) async -> Void)?
 
     /// One Photoshop artboard's layers as this tab's document, after the conversion report when there's anything in it.
     func importArtboard(_ parsed: PSDDocument, named name: String) async {

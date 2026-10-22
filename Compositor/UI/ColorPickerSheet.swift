@@ -5,7 +5,7 @@ import AppKit
 /// new/current preview, RGB and hex entry. Lives in a movable floating panel so
 /// the canvas stays visible and can be clicked to sample a color.
 struct ColorPickerSheet: View {
-    @Bindable var state: ColorPickerState
+    @ObservedObject var state: ColorPickerState
     let finish: (Bool) -> Void
     @State private var hexDraft = ""
     @FocusState private var hexFocused: Bool
@@ -194,7 +194,7 @@ final class ColorPickerPanelController: NSObject {
 struct DialogColorSwatch: View {
     let title: String
     @Binding var color: PaletteColor
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     var body: some View {
         Button {
             session.openDialogColorPicker(title: title, color: color) { color = $0 }

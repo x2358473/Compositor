@@ -15,7 +15,7 @@ struct ExportAsSheet: View {
     private var formats: [ExportFormat] {
         ExportFormat.allCases.filter { ($0 != .exr || hdrRaster != nil) && ($0 != .channelPack || snapshot != nil) }
     }
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let finish: ((data: Data, format: ExportFormat)?) -> Void
     @State private var format: ExportFormat
     @State private var options: JPEGOptions
@@ -233,7 +233,7 @@ struct ExportAsSheet: View {
             let requested = settings
             error = nil
             do {
-                try await Task.sleep(for: .milliseconds(200))
+                try await Task.sleep(nanoseconds: 200_000_000)
                 if requested.format == .channelPack, let snapshot {
                     let packed = try await ImageExporter.shared.channelPack(snapshot, sources: requested.channels,
                                                                             width: requested.width, height: requested.height)
@@ -279,7 +279,7 @@ struct ExportAsSheet: View {
             Toggle("RGB".localized, isOn: Binding(get: { !cmyk }, set: { if $0 { cmyk = false } }))
             Toggle("CMYK".localized, isOn: Binding(get: { cmyk }, set: { if $0 { cmyk = true } }))
         }
-        .menuStyle(.button).buttonStyle(.bordered).fixedSize()
+        .menuStyle(.borderlessButton).buttonStyle(.bordered).fixedSize()
         .help("CMYK writes a printer's inks through the profile in View › CMYK › Profile".localized)
     }
 
@@ -303,7 +303,7 @@ struct ExportAsSheet: View {
             }
             .pickerStyle(.inline).labelsHidden()
         }
-        .menuStyle(.button).fixedSize()
+        .menuStyle(.borderlessButton).fixedSize()
         .help("Other formats: TIFF and PDF\(others.contains(.exr) ? ", EXR to keep light brighter than white" : ""), and Channel Pack for game textures")
         if chosen { menu.buttonStyle(.borderedProminent) } else { menu.buttonStyle(.bordered) }
     }
@@ -365,9 +365,6 @@ struct JPEGPreview: View {
     let pixelHeight: Int
     @Binding var zoom: Double?
     @Environment(\.displayScale) private var displayScale
-    @State private var position = ScrollPosition()
-    @State private var offset = CGPoint.zero
-    @State private var dragStart: CGPoint?
 
     /// The zoom at which the whole image fits `frame`.
     static func fitZoom(width: Int, height: Int, in frame: CGSize, displayScale: CGFloat) -> Double {
@@ -383,27 +380,14 @@ struct JPEGPreview: View {
         GeometryReader { geometry in
             if let zoom {
                 let size = shownSize(zoom)
-                ScrollView([.horizontal, .vertical]) {
+                PreviewScrollView(size: size) {
                     // Nearest-neighbor from 100% up, so each pixel of the JPEG and its artifacts shows as it is.
                     Image(decorative: image, scale: 1).resizable().interpolation(zoom >= 1 ? .none : .high)
                         .frame(width: size.width, height: size.height)
                         .background { Self.checkerboard }
                         .frame(minWidth: geometry.size.width, minHeight: geometry.size.height)
                 }
-                .scrollIndicators(.visible)
-                .scrollPosition($position)
-                .onScrollGeometryChange(for: CGPoint.self, of: { $0.contentOffset }) { _, new in offset = new }
-                .gesture(DragGesture(minimumDistance: 1)
-                    .onChanged { drag in
-                        let start = dragStart ?? offset
-                        dragStart = start
-                        position.scrollTo(point: CGPoint(x: start.x - drag.translation.width, y: start.y - drag.translation.height))
-                    }
-                    .onEnded { _ in dragStart = nil })
                 .onTapGesture(count: 2) { self.zoom = nil }
-                .onAppear { keepCentered(from: nil, to: zoom, in: geometry.size) }
-                .onChange(of: zoom) { old, new in keepCentered(from: old, to: new, in: geometry.size) }
-                .pointerStyle(dragStart == nil ? .grabIdle : .grabActive)
             } else {
                 Image(decorative: image, scale: 1).resizable().interpolation(.high).scaledToFit()
                     .background { Self.checkerboard }
@@ -433,18 +417,4 @@ struct JPEGPreview: View {
         CGSize(width: CGFloat(pixelWidth) / max(1, displayScale) * zoom, height: CGFloat(pixelHeight) / max(1, displayScale) * zoom)
     }
 
-    /// Zooming keeps the middle of the view on the same part of the image; coming from Fit, it starts at the center.
-    private func keepCentered(from old: Double?, to new: Double?, in view: CGSize) {
-        guard let new else { return }
-        let size = shownSize(new)
-        var middle = CGPoint(x: size.width / 2, y: size.height / 2)
-        if let old {
-            let before = shownSize(old)
-            let fx = before.width > 0 ? (offset.x + min(view.width, before.width) / 2) / before.width : 0.5
-            let fy = before.height > 0 ? (offset.y + min(view.height, before.height) / 2) / before.height : 0.5
-            middle = CGPoint(x: fx * size.width, y: fy * size.height)
-        }
-        position.scrollTo(point: CGPoint(x: min(max(0, middle.x - view.width / 2), max(0, size.width - view.width)),
-                                         y: min(max(0, middle.y - view.height / 2), max(0, size.height - view.height))))
-    }
 }

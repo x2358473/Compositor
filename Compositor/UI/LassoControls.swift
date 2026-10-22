@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LassoControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
 
     var body: some View {
         HStack(spacing: 12) {
@@ -185,7 +185,7 @@ struct PolygonalLassoToolIcon: View {
 
 /// Selection modifiers share the filter panels' floating window and control layout.
 struct SelectionAmountSheet: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let operation: EditorSession.SelectionAmountOperation
     @State private var input: String
     @FocusState private var focused: Bool

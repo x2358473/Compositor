@@ -66,7 +66,7 @@ extension ProjectController {
         let attempt = externalChanges.recheckAttempt
         externalChanges.recheckAttempt = min(attempt + 1, 7)
         externalChanges.recheck = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(250 * (1 << attempt)))
+            try? await Task.sleep(nanoseconds: UInt64(250 * (1 << attempt)) * 1_000_000)
             guard let self, !Task.isCancelled else { return }
             self.noteExternalChange()
         }

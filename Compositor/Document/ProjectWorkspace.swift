@@ -1,5 +1,5 @@
 import AppKit
-import Observation
+import Combine
 import UniformTypeIdentifiers
 
 @MainActor
@@ -17,12 +17,18 @@ final class ProjectTab: Identifiable {
     }
 }
 
-@MainActor @Observable
-final class ProjectWorkspace {
-    private(set) var tabs: [ProjectTab] = []
-    private(set) var selectedID: UUID
-    var isManaging = false
-    @ObservationIgnored weak var window: NSWindow?
+@MainActor
+final class ProjectWorkspace: ObservableObject {
+    @Published private(set) var tabs: [ProjectTab] = [] { didSet { observeTabs() } }
+    @Published private(set) var selectedID: UUID
+    @Published var isManaging = false
+    weak var window: NSWindow?
+    private var tabChanges: [AnyCancellable] = []
+    private func observeTabs() {
+        tabChanges = tabs.map { tab in
+            tab.session.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        }
+    }
     var current: ProjectTab { tabs.first { $0.id == selectedID } ?? tabs[0] }
     var canSwitch: Bool {
         let s = current.session
@@ -35,6 +41,7 @@ final class ProjectWorkspace {
         first.session.skipsInitialClipboardCanvasSize = true
         tabs = [first]; selectedID = first.id
         first.controller.workspace = self
+        observeTabs()
     }
     /// A new tab's name: "Untitled" if no tab shows it, otherwise the lowest "Untitled N" free, as Finder and Safari
     /// number them. Counting up for ever, closing the last tab made Untitled 2, then 3, and on.
@@ -195,7 +202,7 @@ final class ProjectWorkspace {
         defer { for (url, scoped) in files where scoped { url.stopAccessingSecurityScopedResource() } }
         while !canSwitch {
             if Task.isCancelled { return }
-            try? await Task.sleep(for: .milliseconds(30))
+            try? await Task.sleep(nanoseconds: 30_000_000)
         }
         isManaging = true; defer { isManaging = false }
         for url in urls {

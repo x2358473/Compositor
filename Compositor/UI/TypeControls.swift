@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct TypeControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private func value<T>(_ key: WritableKeyPath<LayerTextStyle, T>) -> Binding<T> {
         Binding(get: { session.currentTextStyle[keyPath: key] }, set: { value in
             session.changeTextStyle { $0[keyPath: key] = value }
@@ -156,7 +156,7 @@ private struct TypeFontPicker: NSViewRepresentable {
     func makeNSView(context: Context) -> NSPopUpButton {
         let button = FixedWidthPopUpButton(frame: .zero, pullsDown: false)
         if !fontName.isEmpty { button.addItem(withTitle: fontName) }
-        button.borderShape = .capsule
+        button.bezelStyle = .rounded
         // A long font name is cut off at its end rather than widening the control or scrolling its start away.
         button.cell?.lineBreakMode = .byTruncatingTail
         button.cell?.usesSingleLineMode = true

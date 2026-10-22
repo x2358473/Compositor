@@ -2,7 +2,7 @@ import SwiftUI
 
 /// View > Grid Settings…: every change shows on the canvas at once through `preview`; Cancel puts back what was there.
 struct GridSettingsSheet: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let preview: (LayoutGrid, GridAppearance) -> Void
     let finish: ((LayoutGrid, GridAppearance)?) -> Void
     @State private var spacing: Int

@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 struct EditorCanvas: NSViewRepresentable {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     func makeNSView(context: Context) -> CanvasView { CanvasView(session: session) }
     func updateNSView(_ view: CanvasView, context: Context) {
         view.consumeFocusRequest(session.canvasFocusRequest)
@@ -1634,11 +1634,18 @@ final class CanvasView: NSView {
         }
         addCursorRect(bounds, cursor: toolCursor)
         guard session.tool == .crop, !spaceHeld else { return }
-        let positions: [NSCursor.FrameResizePosition] = [.topLeft, .top, .topRight, .right, .bottomRight, .bottom, .bottomLeft, .left]
         for region in transformOverlay.cropResizeRegions.reversed() {
             let rect = region.rect.intersection(bounds)
             if !rect.isEmpty && !rect.isNull {
-                addCursorRect(rect, cursor: .frameResize(position: positions[region.index], directions: [.inward, .outward]))
+                let cursor: NSCursor
+                if #available(macOS 15.0, *) {
+                    let positions: [NSCursor.FrameResizePosition] = [.topLeft, .top, .topRight, .right, .bottomRight, .bottom, .bottomLeft, .left]
+                    cursor = .frameResize(position: positions[region.index], directions: [.inward, .outward])
+                } else {
+                    let direction = region.index % 4
+                    cursor = direction == 1 ? .resizeUpDown : direction == 3 ? .resizeLeftRight : .crosshair
+                }
+                addCursorRect(rect, cursor: cursor)
             }
         }
     }

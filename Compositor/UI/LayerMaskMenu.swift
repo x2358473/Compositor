@@ -4,7 +4,7 @@ import SwiftUI
 /// selection. Option-click adds the opposite: all black, or hiding the selection.
 /// Enable/Disable and Delete live in the layer's context menu.
 struct LayerMaskMenu: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     var body: some View {
         Button {
             session.addMask(revealing: NSApp.currentEvent?.modifierFlags.contains(.option) != true)
@@ -20,7 +20,7 @@ struct LayerMaskMenu: View {
 /// Over the canvas while it shows a mask by itself: whose mask it is, and a way back to the composite besides
 /// Option-clicking the thumbnail again. Built in AppKit, as the canvas under it is, so its button gets its clicks.
 struct MaskAloneBadge: NSViewRepresentable {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     let layer: ImageLayer
     func makeNSView(context: Context) -> CanvasPillView {
         CanvasPillView(symbol: "rectangle.inset.filled", closeLabel: "Stop viewing the mask",

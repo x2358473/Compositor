@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LayerAppearanceControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     let layerID: UUID?
     @State private var percentage = "100"
     @State private var stepper = ArrowStepper()
