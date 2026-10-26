@@ -4,8 +4,13 @@ import CoreImage
 
 nonisolated enum SubjectRemoval {
     enum Failure: LocalizedError {
-        case noSubject
-        var errorDescription: String? { "No foreground subject was detected in this layer. Try an image with a more distinct subject." }
+        case noSubject, unsupported
+        var errorDescription: String? {
+            switch self {
+            case .noSubject: return "No foreground subject was detected in this layer. Try an image with a more distinct subject."
+            case .unsupported: return "Automatic background removal requires macOS 14 or later. Use a layer mask or a manual selection on this Mac."
+            }
+        }
     }
     /// Vision's own mask for an image, kept while the panel is open so moving a slider only redoes the refining.
     private static let cache = MaskCache()
@@ -27,7 +32,8 @@ nonisolated enum SubjectRemoval {
     /// Vision's raw subject mask, white over the subject: the model has no settings of its own, so everything the
     /// panel offers is done to this afterwards by `refined`.
     private static func vision(_ image: CGImage) throws -> CGImage {
-        try cache.mask(for: image) {
+        guard #available(macOS 14.0, *) else { throw Failure.unsupported }
+        return try cache.mask(for: image) {
             let handler = VNImageRequestHandler(cgImage: image, orientation: .up)
             let request = VNGenerateForegroundInstanceMaskRequest()
             try handler.perform([request])

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PenControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
 
     var body: some View {
         HStack(spacing: 12) {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CameraRawCurveControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var edit: FilterEdit? { session.filterEdit }
     /// What a drag in the graph is moving, picked when it starts and kept until it ends, as Image › Curves does: a
@@ -9,6 +9,7 @@ struct CameraRawCurveControls: View {
     private enum Drag { case point(Int), divider(Int), region(WritableKeyPath<CameraRawCurveSettings, Double>, Double) }
     @State private var drag: Drag?
     @State private var selected: Int?
+    @State private var clickLocation = CGPoint.zero
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -92,14 +93,15 @@ struct CameraRawCurveControls: View {
             // nothing could be dragged, and picking the nearest point afresh at every step jumped between points.
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { value in
+                    clickLocation = value.startLocation
                     if drag == nil { drag = edit?.cameraRawCurvePage == .parametric ? parametricDrag(at: value.startLocation, in: size)
                                                                                      : pointDrag(at: value.startLocation, in: size) }
                     continueDrag(value, in: size)
                 }
                 .onEnded { _ in drag = nil })
-            .simultaneousGesture(SpatialTapGesture(count: 2).onEnded { value in
+            .simultaneousGesture(TapGesture(count: 2).onEnded {
                 guard edit?.cameraRawCurvePage == .point else { return }
-                removePoint(at: value.location, in: size)
+                removePoint(at: clickLocation, in: size)
             })
         }
         .background(Color.black.opacity(0.35))
@@ -260,7 +262,7 @@ private enum CurvePreset: Hashable {
 }
 
 struct CameraRawMixerControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var edit: FilterEdit? { session.filterEdit }
     /// What a drag in the graph is moving, picked when it starts and kept until it ends, as Image › Curves does: a
@@ -424,7 +426,7 @@ struct CameraRawMixerControls: View {
 }
 
 struct CameraRawGradingControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var page: CameraRawGradePage { session.filterEdit?.cameraRawGradePage ?? .threeWay }
 

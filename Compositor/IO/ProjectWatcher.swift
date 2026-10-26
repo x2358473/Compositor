@@ -15,7 +15,7 @@ final class ProjectWatcher {
     private var delivery: Task<Void, Never>?
     private var rearm: Task<Void, Never>?
     /// How long to wait after the last event before reporting, so a save that touches several files reports once.
-    static let coalescing: Duration = .milliseconds(300)
+    static let coalescing: UInt64 = 300_000_000 // Nanoseconds.
 
     init(url: URL, onChange: @escaping @MainActor () -> Void) {
         self.url = url
@@ -69,7 +69,7 @@ final class ProjectWatcher {
         rearm?.cancel()
         rearm = Task { @MainActor [weak self] in
             for _ in 0..<20 {
-                try? await Task.sleep(for: .milliseconds(100))
+                try? await Task.sleep(nanoseconds: 100_000_000)
                 guard let self, !Task.isCancelled else { return }
                 self.arm()
                 if self.sources.count == self.watchedPaths.count { return }
@@ -77,7 +77,7 @@ final class ProjectWatcher {
         }
         delivery?.cancel()
         delivery = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: Self.coalescing)
+            try? await Task.sleep(nanoseconds: Self.coalescing)
             guard let self, !Task.isCancelled else { return }
             self.onChange()
         }

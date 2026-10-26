@@ -168,8 +168,14 @@ nonisolated enum TiledLayerRenderer {
         context.saveGState()
         context.setShouldAntialias(false)
         let outline = CGPath(rect: visible.insetBy(dx: -64, dy: -64), transform: nil)
-        context.addPath(outline.subtracting(CGPath(rect: device.insetBy(dx: -0.001, dy: -0.001), transform: [toUser]), using: .winding))
+        context.addPath(outline)
         context.clip()
+        // Intersect with the complement in device space, preserving fractional edges.
+        let complement = CGMutablePath()
+        complement.addRect(visible.applying(toDevice).union(device).insetBy(dx: -128, dy: -128))
+        complement.addRect(device.insetBy(dx: -0.001, dy: -0.001))
+        context.addPath(complement.copy(using: [toUser])!)
+        context.clip(using: .evenOdd)
         unchanged()
         context.restoreGState()
 
@@ -259,10 +265,17 @@ nonisolated enum TiledLayerRenderer {
     private static func clip(to area: CGRect, excluding holes: [CGRect], frame: Frame, in context: CGContext) {
         context.setShouldAntialias(false)
         let outline = CGPath(rect: snapped(frame.mapped(area), in: context), transform: nil)
-        let cut = CGMutablePath()
-        for hole in holes where hole.intersects(area) { cut.addRect(snapped(frame.mapped(hole), in: context)) }
-        context.addPath(cut.isEmpty ? outline : outline.subtracting(cut, using: .winding))
+        context.addPath(outline)
         context.clip()
+        // Separate complement clips subtract the union, including overlapping holes.
+        for hole in holes where hole.intersects(area) {
+            let cut = CGMutablePath()
+            let rect = snapped(frame.mapped(hole), in: context)
+            cut.addRect(outline.boundingBoxOfPath.union(rect).insetBy(dx: -1, dy: -1))
+            cut.addRect(rect)
+            context.addPath(cut)
+            context.clip(using: .evenOdd)
+        }
     }
 
     /// A clip edge on a fraction of a screen pixel leaves that pixel to be rounded one way here and the other way in

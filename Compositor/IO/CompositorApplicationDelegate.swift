@@ -1,8 +1,18 @@
 import AppKit
 import Sparkle
+import Combine
 
-final class CompositorApplicationDelegate: NSObject, NSApplicationDelegate {
+final class CompositorApplicationDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let workspace = ProjectWorkspace()
+    private var changes: [AnyCancellable] = []
+
+    override init() {
+        super.init()
+        changes = [workspace.objectWillChange, RecentProjects.shared.objectWillChange,
+                   ShortcutSettings.shared.objectWillChange].map { publisher in
+            publisher.sink { [weak self] _ in self?.objectWillChange.send() }
+        }
+    }
     var session: EditorSession { workspace.current.session }
     var projects: ProjectController { workspace.current.controller }
     var showEditor: (() -> Void)?
@@ -33,11 +43,12 @@ final class CompositorApplicationDelegate: NSObject, NSApplicationDelegate {
             // appears. A Dock click's reopen event makes the window, so the app sends itself one once launched.
             else { DispatchQueue.main.async { Self.reopen() } }
         }
-        application.activate()
+        if #available(macOS 14.0, *) { application.activate() }
+        else { application.activate(ignoringOtherApps: true) }
         Task { await workspace.receive(urls) }
     }
 
-    private static func reopen() {
+    static func reopen() {
         let event = NSAppleEventDescriptor(eventClass: AEEventClass(kCoreEventClass), eventID: AEEventID(kAEReopenApplication),
                                            targetDescriptor: .currentProcess(), returnID: AEReturnID(kAutoGenerateReturnID),
                                            transactionID: AETransactionID(kAnyTransactionID))

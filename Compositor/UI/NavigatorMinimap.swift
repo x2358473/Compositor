@@ -5,7 +5,7 @@ import SwiftUI
 /// the document. The whole document in small, with a box in the accent color around what the canvas shows; clicking
 /// or dragging in it moves the view there. Its picture is redrawn a moment after edits settle, and only while it shows.
 struct NavigatorMinimap: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var picture: CGImage?
 
     static let zoomShown: CGFloat = 3
@@ -47,13 +47,13 @@ struct NavigatorMinimap: View {
             .gesture(DragGesture(minimumDistance: 0).onChanged { value in
                 session.viewport.centerView(on: geometry.documentPoint(for: value.location), documentSize: document.size)
             })
-            .pointerStyle(.default)
+            .onHover { inside in if inside { NSCursor.arrow.push() } else { NSCursor.pop() } }
             .accessibilityElement()
             .accessibilityLabel("Navigator")
             .accessibilityHint("Click or drag to move the view")
             .task(id: RenderKey(document: session.document, revision: session.brushRevision)) {
                 // Edits settle first, so a stroke or a drag redraws the picture once, afterwards.
-                if picture != nil { try? await Task.sleep(for: .milliseconds(250)) }
+                if picture != nil { try? await Task.sleep(nanoseconds: 250_000_000) }
                 guard !Task.isCancelled else { return }
                 picture = session.navigatorImage(maxSide: Self.picturePixels)
             }

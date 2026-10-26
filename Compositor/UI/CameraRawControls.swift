@@ -4,7 +4,7 @@ import SwiftUI
 /// Camera Raw Filter's adjustment column: the histogram, then Light, Color, Color Grading, Effects, Curve,
 /// Color Mixer, Detail, Optics, Geometry, and Calibration.
 struct CameraRawControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var expanded: Set<Section> = [.light, .color, .colorGrading]
     @State private var optionMonitor: Any?
 

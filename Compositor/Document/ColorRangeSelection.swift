@@ -1,29 +1,29 @@
 import AppKit
-import Observation
+import Combine
 
 /// Select > Color Range: every pixel near the colors clicked on the canvas, anywhere in the image. The panel shows
 /// the selection live; OK keeps it as one undo step, Cancel puts back the one there was.
-@MainActor @Observable
-final class ColorRangeEdit {
+@MainActor
+final class ColorRangeEdit: ObservableObject {
     static let fuzzinessRange: ClosedRange<Double> = 0...200
     /// The panel's preview fits in this, in points.
     nonisolated static let previewSize = CGSize(width: 292, height: 200)
-    var fuzziness: Double = 40
-    var invert = false
+    @Published var fuzziness: Double = 40
+    @Published var invert = false
     /// What the next click on the canvas does: start over from that color, add it, or take it away.
-    var sampleMode: HueSampleMode = .replace
+    @Published var sampleMode: HueSampleMode = .replace
     /// Shift (add) or Option (take away) held right now, which a click uses over `sampleMode`.
-    var held: HueSampleMode?
+    @Published var held: HueSampleMode?
     var effectiveMode: HueSampleMode { held ?? sampleMode }
     /// The selection in black and white, small enough for the panel. Nil until a color is picked.
-    var preview: CGImage?
-    var include: [UInt8] = []
-    var exclude: [UInt8] = []
-    var error: String?
+    @Published var preview: CGImage?
+    @Published var include: [UInt8] = []
+    @Published var exclude: [UInt8] = []
+    @Published var error: String?
     /// The image as shown, at document size: what the colors are matched against.
-    @ObservationIgnored let image: CGImage
-    @ObservationIgnored let original: DocumentSelection?
-    @ObservationIgnored var generation = 0
+    let image: CGImage
+    let original: DocumentSelection?
+    var generation = 0
     init(image: CGImage, original: DocumentSelection?) { self.image = image; self.original = original }
     var hasColors: Bool { !include.isEmpty }
 }

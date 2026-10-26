@@ -16,15 +16,10 @@ private struct NumericScrub<Value: BinaryFloatingPoint>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .contentShape(Rectangle())
-            .onContinuousHover { phase in
-                switch phase {
-                case .active(_):
-                    isHovering = true
-                    NSCursor.resizeLeftRight.set()
-                case .ended:
-                    isHovering = false
-                    if startValue == nil { NSCursor.arrow.set() }
-                }
+            .onHover { hovering in
+                isHovering = hovering
+                if hovering { NSCursor.resizeLeftRight.set() }
+                else if startValue == nil { NSCursor.arrow.set() }
             }
             .simultaneousGesture(DragGesture(minimumDistance: 1)
                 .onChanged { drag in

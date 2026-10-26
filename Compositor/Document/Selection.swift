@@ -239,19 +239,32 @@ extension EditorSession {
                            : draft.kind == .ellipse ? "Elliptical Marquee" : "Rectangular Marquee")
     }
 
+    private func selectionPath(_ lhs: CGPath, _ rhs: CGPath,
+                               operation: SelectionPathBoolean.Operation) -> CGPath? {
+        guard let result = SelectionPathBoolean.combine(lhs, rhs, operation: operation) else {
+            brushError = "The selection is too large to combine with the available memory. The existing selection was kept."
+            return nil
+        }
+        return result
+    }
+
     func applySelection(_ shape: CGPath, mode: SelectionMode, name: String) {
         guard let document, canEditSelection else { return }
         let canvas = CGPath(rect: CGRect(origin: .zero, size: document.size), transform: nil)
-        let clipped = shape.intersection(canvas, using: .winding)
-        let result: CGPath
+        guard let clipped = selectionPath(shape, canvas, operation: .intersection) else { return }
+        let result: CGPath?
         switch mode {
         case .replace: result = clipped
-        case .add: result = selection.map { $0.path.union(clipped, using: .winding) } ?? clipped
+        case .add:
+            if let current = selection {
+                result = selectionPath(current.path, clipped, operation: .union)
+            } else { result = clipped }
         case .subtract:
             // Subtracting from no selection selects nothing new, so nothing changes.
             guard let current = selection else { return }
-            result = current.path.subtracting(clipped, using: .winding)
+            result = selectionPath(current.path, clipped, operation: .subtract)
         }
+        guard let result else { return }
         setSelection(DocumentSelection(path: result, antialiased: selectionAntialiased), name: name)
     }
 
@@ -343,10 +356,12 @@ extension EditorSession {
         guard let document, let current = selection, canModifySelection, delta != 0, abs(delta) <= 500 else { return }
         // A band `|delta|` wide on each side of the outline, added or removed.
         let band = current.path.copy(strokingWithWidth: abs(delta) * 2, lineCap: .round, lineJoin: .round, miterLimit: 10)
-        let result = delta > 0
-            ? current.path.union(band, using: .winding)
-                .intersection(CGPath(rect: CGRect(origin: .zero, size: document.size), transform: nil), using: .winding)
-            : current.path.subtracting(band, using: .winding)
+        guard var result = selectionPath(current.path, band, operation: delta > 0 ? .union : .subtract) else { return }
+        if delta > 0 {
+            let canvas = CGPath(rect: CGRect(origin: .zero, size: document.size), transform: nil)
+            guard let clipped = selectionPath(result, canvas, operation: .intersection) else { return }
+            result = clipped
+        }
         setSelection(DocumentSelection(path: result, antialiased: current.antialiased, feather: current.feather), name: name)
     }
 
@@ -363,7 +378,8 @@ extension EditorSession {
     func invertSelection() {
         guard let document, let current = selection else { return }
         let canvas = CGPath(rect: CGRect(origin: .zero, size: document.size), transform: nil)
-        let inverse = DocumentSelection(path: canvas.subtracting(current.path, using: .winding), antialiased: current.antialiased,
+        guard let path = selectionPath(canvas, current.path, operation: .subtract) else { return }
+        let inverse = DocumentSelection(path: path, antialiased: current.antialiased,
                                         feather: current.feather)
         // The inverse of everything is no selection at all, as in Photoshop — not an invisible empty one that
         // quietly stops every brush.
