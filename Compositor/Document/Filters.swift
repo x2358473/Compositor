@@ -56,6 +56,9 @@ nonisolated enum FilterKind: String, CaseIterable, Sendable {
         self == .curves || self == .exposure || self == .gradientMap || self == .grain
             || self == .blackWhite || self == .colorBalance
     }
+
+    /// The localized name.
+    var localizedName: String { rawValue.localized }
 }
 
 /// Remove Background's two ways of working: Apple's own subject mask on its own, or that mask refined against the
@@ -63,6 +66,9 @@ nonisolated enum FilterKind: String, CaseIterable, Sendable {
 nonisolated enum BackgroundQuality: String, CaseIterable, Sendable {
     case basic = "Basic"
     case advanced = "Advanced"
+
+    /// The localized name.
+    var localizedName: String { rawValue.localized }
 }
 
 /// Every filter's settings; each filter reads only its own.

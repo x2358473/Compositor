@@ -12,7 +12,7 @@ struct CropControls: View {
     var body: some View {
         HStack(spacing: 14) {
             Text("Crop").font(ToolHeaderStyle.titleFont)
-            Picker("Ratio", selection: ratioSelection) {
+            Picker("Ratio".localized, selection: ratioSelection) {
                 // Grouped by shape: free and the canvas's own proportions, square, wide, tall.
                 ForEach(ratioGroups.indices, id: \.self) { index in
                     if index > 0 { Divider() }
@@ -37,9 +37,9 @@ struct CropControls: View {
                                 .font(.caption).foregroundStyle(.orange)
                         }
                         HStack {
-                            Button("Cancel") { showsCustomRatio = false }
+                            Button("Cancel".localized) { showsCustomRatio = false }
                             Spacer()
-                            Button("Apply") { applyCustomRatio() }
+                            Button("Apply".localized) { applyCustomRatio() }
                                 .disabled(CropGeometry.ratio(customRatio) == nil)
                         }
                     }.padding(16).frame(width: 280)
@@ -48,8 +48,8 @@ struct CropControls: View {
                 Text("\(Int(rect.width)) × \(Int(rect.height)) px").monospacedDigit()
             }
             Spacer()
-            Button("Cancel") { session.cancelCrop() }.disabled(session.cropRect == nil)
-            Button("Apply Crop") { Task { await session.commitCrop() } }
+            Button("Cancel".localized) { session.cancelCrop() }.disabled(session.cropRect == nil)
+            Button("Apply Crop".localized) { Task { await session.commitCrop() } }
                 .disabled(session.cropRect == nil)
         }.padding(.horizontal, 18).toolHeaderBar().disabled(session.showsBusy || session.document == nil)
     }
