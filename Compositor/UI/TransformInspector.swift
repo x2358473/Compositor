@@ -8,15 +8,15 @@ struct TransformInspector: View {
     }
     var body: some View {
         HStack(spacing: 12) {
-          Text(session.transformTargetsMask ? "Transform Mask" : "Transform").font(ToolHeaderStyle.titleFont)
+          Text(session.transformTargetsMask ? "Transform Mask".localized : "Transform".localized).font(ToolHeaderStyle.titleFont)
               .padding(.leading, 18)
           // Command flips Auto Select while it's held, and the box shows it flipped (see HeldModifiers).
-          Toggle("Auto Select", isOn: Binding(get: { session.transformAutoSelect != held.contains(.command) },
+          Toggle("Auto Select".localized, isOn: Binding(get: { session.transformAutoSelect != held.contains(.command) },
                                               set: { session.transformAutoSelect = $0 != held.contains(.command) }))
-              .help("Select layers by clicking the canvas. Hold Command to turn it the other way while you click.")
+              .help("Select layers by clicking the canvas. Hold Command to turn it the other way while you click.".localized)
               .accessibilityIdentifier("transformAutoSelect")
-          Toggle("Show Controls", isOn: $session.showsTransformControls)
-              .help("Show the transform box and handles (⌘H). When hidden, drag anywhere to move the layer.")
+          Toggle("Show Controls".localized, isOn: $session.showsTransformControls)
+              .help("Show the transform box and handles (⌘H). When hidden, drag anywhere to move the layer.".localized)
           ScrollView(.horizontal) {
             HStack(spacing: 12) {
             HStack(spacing: 12) {
@@ -27,29 +27,29 @@ struct TransformInspector: View {
                 // Shift flips the lock while dragging a handle, and the button shows it flipped.
                 Toggle(isOn: Binding(get: { session.locksTransformRatio != held.contains(.shift) },
                                      set: { session.locksTransformRatio = $0 != held.contains(.shift) })) { Image(systemName: "link") }
-                    .toggleStyle(.button).help("Lock aspect ratio. Hold Shift while dragging a handle to turn it the other way.")
+                    .toggleStyle(.button).help("Lock aspect ratio. Hold Shift while dragging a handle to turn it the other way.".localized)
                 TransformValueField(label: "Scale", suffix: "%", fieldWidth: Self.shortField, value: value.scalePercent(pixelSize: pixelSize), range: 0.1...30_000, finish: finish) { number in
                     change { value in
                         guard number > 0 else { return }
                         value = value.scaled(toPercent: number, pixelSize: pixelSize)
                     }
-                }.fixedSize().help("Scale width and height together, about the center")
+                }.fixedSize().help("Scale width and height together, about the center".localized)
                 TransformValueField(label: "°", fieldWidth: Self.shortField, value: value.rotation, range: -360...360, finish: finish) { number in
                     change { $0.rotation = number.truncatingRemainder(dividingBy: 360) }
                 }.fixedSize()
-                Picker("Sampling", selection: Binding(get: { value.sampling }, set: { sampling in
+                Picker("Sampling".localized, selection: Binding(get: { value.sampling }, set: { sampling in
                     change { $0.sampling = sampling }
                 })) {
-                    ForEach(LayerSampling.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    ForEach(LayerSampling.allCases, id: \.self) { Text($0.localizedName).tag($0) }
                 }.frame(width: 170)
                 Button { change { $0.flipX.toggle() } } label: {
                     Image(systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right")
                 }
-                .help("Flip Horizontal").accessibilityLabel("Flip Horizontal")
+                .help("Flip Horizontal".localized).accessibilityLabel("Flip Horizontal")
                 Button { change { $0.flipY.toggle() } } label: {
                     Image(systemName: "arrow.up.and.down.righttriangle.up.righttriangle.down")
                 }
-                .help("Flip Vertical").accessibilityLabel("Flip Vertical")
+                .help("Flip Vertical".localized).accessibilityLabel("Flip Vertical")
                 Divider().frame(height: 16)
 
             // Numbers describe an ordinary transform; while distorted, the handles are the controls.
@@ -64,9 +64,9 @@ struct TransformInspector: View {
           // which they never are. Left in place unseen, so Escape and Return still reach a drag in progress.
           let pending = session.transformEdit?.persistent == true
           HStack(spacing: 12) {
-              Button("Cancel") { session.cancelTransform() }.configuredNativeShortcut(.escape)
+              Button("Cancel".localized) { session.cancelTransform() }.configuredNativeShortcut(.escape)
                   .disabled(session.transformEdit == nil)
-              Button("Apply") { session.commitTransform() }.configuredNativeShortcut(.return)
+              Button("Apply".localized) { session.commitTransform() }.configuredNativeShortcut(.return)
                   .disabled(session.transformEdit == nil).accessibilityIdentifier("applyTransform")
           }
           .opacity(pending ? 1 : 0).allowsHitTesting(pending).accessibilityHidden(!pending)
@@ -173,7 +173,7 @@ private struct AlignButton: View {
     @State private var showing = false
 
     var body: some View {
-        Button("Align") { showing.toggle() }
+        Button("Align".localized) { showing.toggle() }
             .disabled(!session.canAlignLayers)
             .help("Line layers up with each other, the selection, or the canvas when one is selected")
             .popover(isPresented: $showing, arrowEdge: .bottom) {
