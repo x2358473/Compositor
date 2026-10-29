@@ -40,7 +40,7 @@ struct GIFTimeline: View {
                     Text(timing.mode == .uniform ? "\(Int(delay.rounded()))ms" : originalDelays(spaced: false))
                         .font(.system(size: 13)).foregroundStyle(.secondary)
                 }
-                .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+                .menuStyle(.borderlessButton).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
                 .disabled(!canEditTiming)
                 .help("How long each frame shows")
             }
@@ -73,12 +73,12 @@ struct GIFTimeline: View {
         let timing: GIFFrameTiming
     }
 
-    func play<C: Clock>(clock: C = ContinuousClock()) async where C.Duration == Duration {
+    func play() async {
         guard isPlaying, frames.count > 1 else { return }
         let durations = frames.map { max(GIFTimelineLimits.minimumFrameDuration, timing.delay(for: $0)) }
         let initial = frames.firstIndex { $0.index == selectedFrameIndex } ?? 0
         do {
-            try await GIFPreviewPlayback.play(durations: durations, startingAt: initial, clock: clock) { position in
+            try await GIFPreviewPlayback.play(durations: durations, startingAt: initial) { position in
                 await onSelectFrame(frames[position].index)
             }
         } catch is CancellationError { }

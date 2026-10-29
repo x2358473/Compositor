@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TransformInspector: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var value: LayerTransform {
         session.transformEdit?.draft ?? session.activeLayer.map { session.editedTransform(for: $0) }
             ?? LayerTransform(origin: .zero, size: CGSize(width: 1, height: 1))
@@ -169,7 +169,7 @@ struct TransformValueField: View {
 /// three ways and distributing two. Layers line up with
 /// the selection, with the canvas when one layer is selected, or else with each other; distributing takes three or more.
 private struct AlignButton: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var showing = false
 
     var body: some View {

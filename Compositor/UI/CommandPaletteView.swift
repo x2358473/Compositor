@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The palette: a search field over the ranked commands. ↑/↓ choose, Return runs, Esc closes.
 struct CommandPaletteView: View {
-    @Bindable var model: CommandPaletteModel
+    @ObservedObject var model: CommandPaletteModel
     let run: (CommandPaletteEntry) -> Void
     let close: () -> Void
     @FocusState private var searching: Bool
@@ -14,8 +14,10 @@ struct CommandPaletteView: View {
                 .textFieldStyle(.plain).font(.system(size: 17))
                 .padding(.horizontal, 16).padding(.vertical, 13)
                 .focused($searching)
-                .onKeyPress(.upArrow) { model.move(by: -1); return .handled }
-                .onKeyPress(.downArrow) { model.move(by: 1); return .handled }
+                .onMoveCommand { direction in
+                    if direction == .up { model.move(by: -1) }
+                    if direction == .down { model.move(by: 1) }
+                }
                 .onSubmit { if let entry = model.selected { run(entry) } }
                 .onExitCommand(perform: close)
             Divider()
@@ -88,10 +90,11 @@ final class CommandPaletteController {
             + CommandPaletteEntry.tools(for: session)
         let model = CommandPaletteModel(entries: entries)
         let panel = self.panel ?? makePanel()
-        let host = NSHostingView(rootView: CommandPaletteView(model: model, run: { [weak self] in self?.run($0) },
-                                                             close: { [weak self] in self?.close() }))
+        let host = PanelHostingView(rootView: AnyView(CommandPaletteView(model: model, run: { [weak self] in self?.run($0) },
+                                                                        close: { [weak self] in self?.close() })))
         // The panel keeps the size given below rather than growing to what SwiftUI would like.
-        host.sizingOptions = []
+        host.sizesToContent = false
+        if #available(macOS 13, *) { host.sizingOptions = [] }
         host.frame = NSRect(x: 0, y: 0, width: 460, height: 290)
         panel.contentView = host
         panel.setContentSize(NSSize(width: 460, height: 290))

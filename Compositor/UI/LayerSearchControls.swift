@@ -101,7 +101,7 @@ extension EditorSession {
 /// (and itself into a close button), and a funnel that opens the type filter (blue while one is on). Escape on an
 /// empty search, or the close button, puts the title back.
 struct LayersHeader: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var searching = false
     /// Whether the funnel's type-filter panel is open.
     @State private var isPresentingFilter = false
@@ -151,7 +151,6 @@ struct LayersHeader: View {
                 get: { session.layerTypeFilter.isEmpty },
                 set: { on in if on { session.clearLayerTypeFilter() } }
             ))
-            .labelReservedIconWidth(16)
             .accessibilityIdentifier("layerFilterAll")
             Divider()
             ForEach(LayerType.allCases.filter { $0 != .selected }, id: \.self) { typeToggle($0) }
@@ -166,7 +165,6 @@ struct LayersHeader: View {
             get: { session.layerTypeFilter.contains(kind) },
             set: { on in if on { session.layerTypeFilter.insert(kind) } else { session.layerTypeFilter.remove(kind) } }
         ))
-        .labelReservedIconWidth(16)
         .accessibilityLabel(kind.filterLabel)
         .accessibilityIdentifier(kind.accessibilityID)
     }

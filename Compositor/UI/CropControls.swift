@@ -3,7 +3,7 @@ import SwiftUI
 /// The Crop tool's header. A view of its own because dragging the crop frame changes `cropRect` on
 /// every mouse move: read here, only this bar re-renders, not the whole editor and its Layers panel.
 struct CropControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var showsCustomRatio = false
     @State private var customRatio = "4:5"
     private let ratioGroups = [["Free", "Canvas"], ["1:1"], ["4:3", "16:9", "2.39:1"], ["3:4", "9:16"]]

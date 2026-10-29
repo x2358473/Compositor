@@ -38,7 +38,8 @@ import Sparkle
         alert.layout()
         Self.trimAccessory(alert)
         Self.alignIconWithTitle(alert)
-        NSApp.activate()
+        if #available(macOS 14.0, *) { NSApp.activate() }
+        else { NSApp.activate(ignoringOtherApps: true) }
         // After Sparkle's call returns, so its updater isn't held up inside a modal run loop.
         DispatchQueue.main.async { [weak self] in
             let response = alert.runModal()

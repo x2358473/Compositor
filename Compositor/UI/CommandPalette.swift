@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 
 /// One thing the command palette can run: a menu command or a tool.
 struct CommandPaletteEntry: Identifiable {
@@ -229,13 +230,13 @@ extension CommandPaletteEntry {
 }
 
 /// What the palette shows: the query, the ranked results and which one is chosen.
-@MainActor @Observable
-final class CommandPaletteModel {
+@MainActor
+final class CommandPaletteModel: ObservableObject {
     let entries: [CommandPaletteEntry]
     // Only a real change goes back to the top: pressing Return writes the same text back, which used to move the
     // choice to the first row just before it ran.
-    var query = "" { didSet { if query != oldValue { selection = 0 } } }
-    var selection = 0
+    @Published var query = "" { didSet { if query != oldValue { selection = 0 } } }
+    @Published var selection = 0
 
     init(entries: [CommandPaletteEntry]) { self.entries = entries }
 

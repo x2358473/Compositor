@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 struct CameraRawGeometryControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var settings: FilterSettings { session.filterEdit?.settings ?? FilterSettings() }
     private var raw: CameraRawSettings { settings.cameraRaw }
 
@@ -88,7 +88,7 @@ struct CameraRawGeometryControls: View {
 }
 
 struct CameraRawCalibrationControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var settings: FilterSettings { session.filterEdit?.settings ?? FilterSettings() }
     private var raw: CameraRawSettings { settings.cameraRaw }
 

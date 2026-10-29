@@ -86,6 +86,7 @@ struct CameraRawSlider: NSViewRepresentable {
         return slider
     }
 
+    @available(macOS 13, *)
     func sizeThatFits(_ proposal: ProposedViewSize, nsView: CameraRawSliderView, context: Context) -> CGSize? {
         CGSize(width: proposal.width ?? 120, height: 22)
     }
@@ -123,6 +124,7 @@ struct CameraRawSlider: NSViewRepresentable {
 }
 
 final class CameraRawSliderView: NSSlider {
+    override var intrinsicContentSize: NSSize { NSSize(width: 120, height: 22) }
     var onReset: (() -> Void)?
     var onTrackClick: ((Double) -> Void)?
     /// True while a press is being tracked, so a binding update does not fight the drag.

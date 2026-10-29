@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct ColorPaletteControls: View {
-    let session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var choosingMaskBackground: Bool?
     private var pickerPanel: ColorPickerPanelController { .shared }
     private let swatchSize: CGFloat = 24

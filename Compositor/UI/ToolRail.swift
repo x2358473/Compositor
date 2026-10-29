@@ -22,22 +22,29 @@ enum ToolRailLayout {
 /// The tools down the left of the window, with the color swatches under them: in one column while it fits the
 /// window's height, otherwise in two, which scroll if the window is shorter still.
 struct ToolRail: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
 
     var body: some View {
-        ViewThatFits(in: .vertical) {
-            ToolRailStack(session: session, columns: 1)
-            // Scrolls when the window is too short for every tool, rather than pushing the bars above and below away.
-            IndicatorlessScrollView { ToolRailStack(session: session, columns: 2) }
-                .frame(width: ToolRailLayout.width(columns: 2))
+        if #available(macOS 13.0, *) {
+            ViewThatFits(in: .vertical) {
+                ToolRailStack(session: session, columns: 1)
+                // Scrolls when the window is too short for every tool, rather than pushing the bars above and below away.
+                IndicatorlessScrollView { ToolRailStack(session: session, columns: 2) }
+                    .frame(width: ToolRailLayout.width(columns: 2))
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        } else {
+            // macOS 12 has no ViewThatFits: keep the single scrolling column.
+            IndicatorlessScrollView { ToolRailStack(session: session, columns: 1) }
+                .frame(width: ToolRailLayout.width(columns: 1))
+                .frame(maxHeight: .infinity, alignment: .top)
         }
-        .frame(maxHeight: .infinity, alignment: .top)
     }
 }
 
 /// The rail's contents: the tools in rows, and the color swatches.
 struct ToolRailStack: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     let columns: Int
 
     private var tools: [NavigationTool] { NavigationTool.allCases.filter { $0 != .idle } }

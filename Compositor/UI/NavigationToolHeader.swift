@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct NavigationToolHeader: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     @State private var zoomText = ""
     @State private var displayedZoomText = ""
     @State private var stepper = ArrowStepper()
