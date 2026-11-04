@@ -140,7 +140,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: Compositor-macOS15-arm64
+          name: Compositor-${{ env.VERSION }}-macOS15-arm64
           path: dist/*
           retention-days: 30
 
@@ -148,6 +148,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          name: Compositor ${{ env.VERSION }} for macOS 15 (Apple silicon)
           files: dist/*
           body: |
             Compositor ${{ env.VERSION }} built for **macOS 15 and later on Apple silicon**.
