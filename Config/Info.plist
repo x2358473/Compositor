@@ -57,12 +57,13 @@
 	</array>
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
+	<!-- The upstream feed only ships builds for macOS 26, so this build must never take an update from it. -->
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/robbietilton/Compositor/main/appcast.xml</string>
+	<string>https://raw.githubusercontent.com/x2358473/Compositor/macos15/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>KZvD724t8QpzTR4OGrHrsCWt538TJ/g/qrTZii+o214=</string>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
+	<false/>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

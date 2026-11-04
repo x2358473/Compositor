@@ -1,0 +1,106 @@
+name: Build for macOS 15
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: macos15-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (macOS 15+, Apple silicon)
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The newest Xcode the runner has: the sources are written against the macOS 26 SDK, and
+      # SWIFT_DEFAULT_ACTOR_ISOLATION (a Swift 6.2 setting the project relies on) needs it. Only the
+      # deployment target is lowered, so everything the SDK marks as macOS 26 is caught at build time.
+      - name: Select Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          swift --version
+
+      - name: Resolve Swift packages
+        run: >
+          xcodebuild -resolvePackageDependencies
+          -project Compositor.xcodeproj
+          -scheme Compositor
+          -onlyUsePackageVersionsFromResolvedFile
+
+      # Signing happens by hand below: the project asks for a development team, which a runner has not.
+      - name: Build (Release, arm64)
+        run: |
+          xcodebuild build \
+            -project Compositor.xcodeproj \
+            -scheme Compositor \
+            -destination 'platform=macOS,arch=arm64' \
+            -configuration Release \
+            -derivedDataPath DerivedData \
+            MACOSX_DEPLOYMENT_TARGET=15.0 \
+            CODE_SIGNING_ALLOWED=NO \
+            ENABLE_CODE_COVERAGE=NO
+
+      - name: Sign the app
+        run: |
+          APP=DerivedData/Build/Products/Release/Compositor.app
+          test -d "$APP"
+          codesign --force --deep --sign - --options runtime \
+            --entitlements Config/Compositor.entitlements "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
+      # Fails the run if the binary still asks for macOS 26, or if it lost the sandbox entitlements.
+      - name: Verify the deployment target
+        run: |
+          APP=DerivedData/Build/Products/Release/Compositor.app
+          vtool -show-build "$APP/Contents/MacOS/Compositor" | tee build-info.txt
+          grep -q 'minos 15.0' build-info.txt
+          codesign -d --entitlements - "$APP" 2>&1 | tee entitlements.txt
+          grep -q 'app-sandbox' entitlements.txt
+
+      - name: Package
+        run: |
+          APP=DerivedData/Build/Products/Release/Compositor.app
+          VERSION=$(grep -m1 'MARKETING_VERSION = ' Compositor.xcodeproj/project.pbxproj | sed 's/.*= \(.*\);/\1/')
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          mkdir -p dist
+          ditto -c -k --keepParent "$APP" "dist/Compositor-${VERSION}-macOS15-arm64.zip"
+          hdiutil create -volname "Compositor" -srcfolder "$APP" -ov -format UDZO \
+            "dist/Compositor-${VERSION}-macOS15-arm64.dmg"
+          ls -lh dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Compositor-macOS15-arm64
+          path: dist/*
+          retention-days: 30
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body: |
+            Compositor ${{ env.VERSION }} built for **macOS 15 and later on Apple silicon**.
+
+            Built from upstream source with the deployment target lowered to 15.0 and the
+            macOS 26-only APIs behind availability checks.
+
+            The app is signed ad hoc, so the first launch needs **right-click → Open**, or run:
+
+            ```
+            xattr -dr com.apple.quarantine /Applications/Compositor.app
+            ```
