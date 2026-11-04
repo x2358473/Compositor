@@ -144,7 +144,7 @@ struct ExportAsSheet: View {
                     // which takes the chosen one's name.
                     HStack(spacing: 12) {
                         Picker("Format", selection: $format) {
-                            ForEach([ExportFormat.jpeg, .png], id: \.self) { Text($0.rawValue).tag($0) }
+                            ForEach([ExportFormat.jpeg, .png], id: \.self) { Text($0.rawValue.localizedKey).tag($0) }
                         }
                         .pickerStyle(.segmented).labelsHidden().fixedSize()
                         moreFormats
@@ -198,7 +198,7 @@ struct ExportAsSheet: View {
                 if format == .channelPack {
                     ForEach(Array(ChannelPack.Channel.allCases.enumerated()), id: \.offset) { index, channel in
                         GridRow {
-                            Text(channel.rawValue)
+                            Text(channel.rawValue.localizedKey)
                             channelPicker(index, channel: channel)
                         }
                     }
@@ -399,9 +399,9 @@ struct ExportAsSheet: View {
     @ViewBuilder private var moreFormats: some View {
         let others = formats.filter { $0 != .png && $0 != .jpeg }
         let chosen = others.contains(format)
-        let menu = Menu(chosen ? format.rawValue : "More") {
+        let menu = Menu(LocalizedStringKey(chosen ? format.rawValue : "More")) {
             Picker("More formats", selection: $format) {
-                ForEach(others, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(others, id: \.self) { Text($0.rawValue.localizedKey).tag($0) }
             }
             .pickerStyle(.inline).labelsHidden()
         }
@@ -413,7 +413,7 @@ struct ExportAsSheet: View {
     /// A channel's source: one of the document's layers or groups, top first, or solid black or white.
     private func channelPicker(_ index: Int, channel: ChannelPack.Channel) -> some View {
         let layers = snapshot?.manifest.layers ?? []
-        return Picker(channel.rawValue, selection: $channels[index]) {
+        return Picker(channel.rawValue.localizedKey, selection: $channels[index]) {
             Text("Black").tag(ChannelPack.Source.black)
             Text("White").tag(ChannelPack.Source.white)
             Divider()
@@ -422,7 +422,7 @@ struct ExportAsSheet: View {
             }
         }
         .labelsHidden().frame(width: 260)
-        .help("What fills the \(channel.rawValue.lowercased()) channel: a layer or group read as grayscale, or solid black or white")
+        .help(("What fills the %@ channel: a layer or group read as grayscale, or solid black or white").localizedFormat(channel.rawValue.lowercased()))
     }
 
     private func sizeField(_ value: Int, set: @escaping (Int) -> Void) -> some View {

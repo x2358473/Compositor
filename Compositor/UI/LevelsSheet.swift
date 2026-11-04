@@ -19,7 +19,7 @@ struct LevelsSheet: View {
             // The channel at the histogram's left edge, Reset across from it.
             HStack {
                 Picker("Channel", selection: Binding(get: { settings.channel }, set: { channel in update { $0.channel = channel } })) {
-                    ForEach(LevelsChannel.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    ForEach(LevelsChannel.allCases, id: \.self) { Text($0.rawValue.localizedKey).tag($0) }
                 }.fixedSize()
                 Spacer()
                 Button("Reset") { edit?.sampleMode = nil; update { $0 = LevelsSettings() } }
@@ -54,19 +54,19 @@ struct LevelsSheet: View {
                         edit?.sampleMode = edit?.sampleMode == mode ? nil : mode
                         session.brushRevision += 1
                     } label: {
-                        Label(mode.rawValue, systemImage: "eyedropper")
+                        Label(mode.rawValue.localizedKey, systemImage: "eyedropper")
                     }.tint(edit?.sampleMode == mode ? .accentColor : .secondary)
                 }
             }
             if let mode = edit?.sampleMode {
-                Text("Click the original layer to set \(mode.rawValue.lowercased()). Click the eyedropper again to stop.")
+                Text(("Click the original layer to set %@. Click the eyedropper again to stop.").localizedFormat(mode.rawValue.lowercased()))
                     .font(.caption).foregroundStyle(.secondary)
             }
             VStack(alignment: .leading, spacing: 6) {
                 Text("Auto").font(.caption).foregroundStyle(.secondary)
                 HStack {
                     ForEach(LevelsAuto.allCases, id: \.self) { mode in
-                        Button(mode.rawValue) { session.autoLevels(mode) }
+                        Button(mode.rawValue.localizedKey) { session.autoLevels(mode) }
                     }
                 }.disabled(edit?.histogramReady != true)
             }
@@ -113,7 +113,7 @@ struct LevelsSheet: View {
             }
             let color: Color = switch settings.channel { case .rgb: .gray; case .red: .red; case .green: .green; case .blue: .blue }
             context.fill(path, with: .color(color))
-        }.accessibilityLabel("Original \(settings.channel.rawValue) histogram")
+        }.accessibilityLabel(Text(("Original %@ histogram").localizedFormat(settings.channel.rawValue)))
         .help("Linear histogram with automatic vertical scaling. Tall spikes may extend beyond the graph; all tones from 0 to 255 remain included.")
     }
     private func handles(output: Bool) -> some View {

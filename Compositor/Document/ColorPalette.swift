@@ -320,7 +320,7 @@ enum ColorPickerTarget: Equatable {
     var title: String {
         switch self {
         case .text: return "Color Picker (Text Color)"
-        case .effect(let kind): return "Color Picker (\(kind.rawValue) Color)"
+        case .effect(let kind): return ("Color Picker (%@ Color)").localizedFormat(kind.rawValue)
         case .palette(let background): return background ? "Color Picker (Background Color)" : "Color Picker (Foreground Color)"
         case .gradientMap(let highlights): return highlights ? "Color Picker (Gradient Map Highlights)" : "Color Picker (Gradient Map Shadows)"
         case .vignette: return "Color Picker (Vignette Color)"

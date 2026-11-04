@@ -8,7 +8,7 @@ struct CompositorApp: App {
     @AppStorage("navigator.visible") private var showsNavigator = false
     private var session: EditorSession { applicationDelegate.session }
     private func filterMenuItem(_ kind: FilterKind) -> some View {
-        Button("\(kind.rawValue)…") { session.beginFilter(kind) }
+        Button((kind.rawValue + "…").localizedKey) { session.beginFilter(kind) }
             .disabled(!(kind == .vignette ? session.canVignette : session.canAdjustColors) || session.hueSaturation != nil)
     }
     var body: some Scene {
@@ -320,7 +320,7 @@ struct CompositorApp: App {
                     Button("Hue/Saturation…") { session.beginHueSaturation() }
                         .configuredKeyboardShortcut("u").disabled(!session.canAdjustColors)
                     ForEach([FilterKind.blackWhite, .colorBalance, .exposure, .gradientMap, .grain], id: \.self) { kind in
-                        Button("\(kind.rawValue)…") { session.beginFilter(kind) }
+                        Button((kind.rawValue + "…").localizedKey) { session.beginFilter(kind) }
                             .disabled(!session.canAdjustColors || session.hueSaturation != nil)
                     }
                     Button(session.isMaskSelected ? "Invert Mask" : "Invert") { Task { await session.invertPixels() } }
@@ -348,7 +348,7 @@ struct CompositorApp: App {
                     }
                 }
                 CommandMenu("Filter") {
-                    Button(session.lastFilter.map { "Last Filter: " + $0.rawValue } ?? "Last Filter") {
+                    Button(session.lastFilter.map { ("Last Filter: %@").localizedFormat($0.rawValue) } ?? "Last Filter".localized) {
                         Task { await session.repeatLastFilter() }
                     }
                         // ⌃⌘F, as in Photoshop; ⌘F is the command palette.
@@ -365,11 +365,13 @@ struct CompositorApp: App {
                     Menu("New Adjustment Layer") {
                         // The Image menu's adjustments, then the Filter menu's filters.
                         ForEach(AdjustmentKind.imageAdjustments, id: \.self) { kind in
-                            Button(kind.rawValue + (kind.isEditable ? "…" : "")) { session.addAdjustment(kind) }
+                            Button(kind.isEditable ? ("%@…").localizedFormat(kind.rawValue) : kind.rawValue.localized) {
+                                session.addAdjustment(kind)
+                            }
                         }
                         Divider()
                         ForEach(AdjustmentKind.filters, id: \.self) { kind in
-                            Button(kind.rawValue + "…") { session.addAdjustment(kind) }
+                            Button(("%@…").localizedFormat(kind.rawValue)) { session.addAdjustment(kind) }
                         }
                     }.disabled(!session.canEditLayers || session.document == nil)
                     Button("Edit Adjustment…") {
@@ -421,19 +423,25 @@ struct CompositorApp: App {
                             .disabled(!session.canTransform)
                         Menu("Align") {
                             ForEach(LayerAlignment.allCases, id: \.self) { alignment in
-                                Button(alignment.rawValue) { session.alignLayers(alignment) }
+                                Button(alignment.rawValue.localizedKey) { session.alignLayers(alignment) }
                             }
                         }
                             .disabled(!session.canAlignLayers)
                         Menu("Distribute") {
                             ForEach(LayerDistribution.allCases, id: \.self) { distribution in
-                                Button(distribution.rawValue) { session.distributeLayers(distribution) }
+                                Button(distribution.rawValue.localizedKey) { session.distributeLayers(distribution) }
                             }
                         }
                             .disabled(!session.canDistributeLayers)
                     }
                     Divider()
-                    Button(session.selectedEffect != nil ? "Delete " + session.selectedEffect!.kind.rawValue : session.isMaskSelected && session.activeLayer.flatMap({ session.selectedMask(for: $0) }) != nil ? "Delete Layer Mask" : session.selectedLayerIDs.count > 1 ? "Delete Layers" : "Delete Layer") {
+                    Button(
+                        session.selectedEffect != nil
+                            ? ("Delete %@").localizedFormat(session.selectedEffect!.kind.rawValue)
+                            : session.isMaskSelected && session.activeLayer.flatMap({ session.selectedMask(for: $0) }) != nil
+                                ? "Delete Layer Mask".localized
+                                : session.selectedLayerIDs.count > 1 ? "Delete Layers".localized : "Delete Layer".localized
+                    ) {
                         session.deleteLayerOrMask()
                     }
                         .disabled(!session.canEditLayers || session.activeLayer == nil)

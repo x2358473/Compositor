@@ -177,7 +177,7 @@ private final class FooterMenuItem: NSMenuItem {
 
     init(title: String, action: @escaping @MainActor () -> Void) {
         run = action
-        super.init(title: title, action: #selector(choose), keyEquivalent: "")
+        super.init(title: NSLocalizedString(title, comment: ""), action: #selector(choose), keyEquivalent: "")
         target = self
     }
 
