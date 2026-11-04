@@ -57,7 +57,11 @@ jobs:
             ENABLE_CODE_COVERAGE=NO > build.log 2>&1
           STATUS=$?
           echo "xcodebuild exited with $STATUS"
-          grep -E "error:" build.log | head -40 | while IFS= read -r line; do
+          # Annotations are the one part of a failed run readable without a token, so the errors are
+          # repeated here, and the tail of the log when xcodebuild failed without saying "error:".
+          MESSAGE=$(grep -E "error:" build.log | head -10)
+          if [ -z "$MESSAGE" ]; then MESSAGE=$(tail -10 build.log); fi
+          echo "$MESSAGE" | while IFS= read -r line; do
             echo "::error::$line"
           done
           tail -60 build.log
