@@ -90,7 +90,13 @@ jobs:
       - name: Record the build errors
         if: failure()
         run: |
-          grep -E "error:" build.log | head -200 > build-errors.txt || true
+          {
+            echo "=== error lines ==="
+            grep -E "error:" build.log | head -100 || true
+            echo
+            echo "=== last 100 lines ==="
+            tail -100 build.log
+          } > build-errors.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B ci-log
