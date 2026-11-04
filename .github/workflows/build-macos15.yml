@@ -14,6 +14,7 @@ concurrency:
 
 permissions:
   contents: write
+  checks: write
 
 jobs:
   build:
@@ -66,6 +67,25 @@ jobs:
           done
           tail -60 build.log
           exit $STATUS
+
+      # Without a token the log is readable only here: part of it goes into the check run's output and
+      # the first error into the artifact's name, both of which are public on a public repository.
+      - name: Publish the build log
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const log = fs.readFileSync('build.log', 'utf8')
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number(context.job),
+              output: {
+                title: 'xcodebuild log',
+                summary: '```\n' + log.slice(-60000) + '\n```'
+              }
+            })
 
       - name: Upload build log
         if: failure()
