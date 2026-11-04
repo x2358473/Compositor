@@ -10,7 +10,8 @@
             "value": "Alpha"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Anamorphic Flare": {
       "extractionState": "manual",
@@ -21,7 +22,8 @@
             "value": "变形宽银幕光晕"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Bokeh": {
       "extractionState": "manual",
@@ -32,7 +34,8 @@
             "value": "散景"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Bottom Edges": {
       "extractionState": "manual",
@@ -43,7 +46,8 @@
             "value": "底部边缘"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Cat's Eye": {
       "extractionState": "manual",
@@ -54,7 +58,8 @@
             "value": "猫眼"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Channel Pack": {
       "extractionState": "manual",
@@ -65,7 +70,8 @@
             "value": "通道打包"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "GIF": {
       "extractionState": "manual",
@@ -76,7 +82,8 @@
             "value": "GIF"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Hexagon": {
       "extractionState": "manual",
@@ -87,7 +94,8 @@
             "value": "六边形"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Horizontal Centers": {
       "extractionState": "manual",
@@ -98,7 +106,8 @@
             "value": "水平居中"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Horizontal Spacing": {
       "extractionState": "manual",
@@ -109,7 +118,8 @@
             "value": "水平间距"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Left Edges": {
       "extractionState": "manual",
@@ -120,7 +130,8 @@
             "value": "左边缘"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Lens Effects": {
       "extractionState": "manual",
@@ -131,7 +142,8 @@
             "value": "镜头效果"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Mist": {
       "extractionState": "manual",
@@ -142,7 +154,8 @@
             "value": "薄雾"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Oval": {
       "extractionState": "manual",
@@ -153,7 +166,8 @@
             "value": "椭圆"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Prism": {
       "extractionState": "manual",
@@ -164,7 +178,8 @@
             "value": "棱镜"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "RGB Split": {
       "extractionState": "manual",
@@ -175,7 +190,8 @@
             "value": "RGB 分离"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Reduce Noise": {
       "extractionState": "manual",
@@ -186,7 +202,8 @@
             "value": "减少杂色"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Right Edges": {
       "extractionState": "manual",
@@ -197,7 +214,8 @@
             "value": "右边缘"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Rim Light": {
       "extractionState": "manual",
@@ -208,7 +226,8 @@
             "value": "边缘光"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Round": {
       "extractionState": "manual",
@@ -219,7 +238,8 @@
             "value": "圆形"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Sharpen": {
       "extractionState": "manual",
@@ -230,7 +250,8 @@
             "value": "锐化"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Starburst": {
       "extractionState": "manual",
@@ -241,7 +262,8 @@
             "value": "星芒"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Top Edges": {
       "extractionState": "manual",
@@ -252,7 +274,8 @@
             "value": "顶部边缘"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Vertical Centers": {
       "extractionState": "manual",
@@ -263,7 +286,8 @@
             "value": "垂直居中"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Vertical Spacing": {
       "extractionState": "manual",
@@ -274,7 +298,8 @@
             "value": "垂直间距"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Volumetric Light": {
       "extractionState": "manual",
@@ -285,7 +310,8 @@
             "value": "体积光"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Blend Mode": {
       "extractionState": "manual",
@@ -296,7 +322,8 @@
             "value": "混合模式"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Hide Layers": {
       "extractionState": "manual",
@@ -307,7 +334,8 @@
             "value": "隐藏图层"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Show Layers": {
       "extractionState": "manual",
@@ -318,7 +346,8 @@
             "value": "显示图层"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "%@…": {
       "extractionState": "manual",
@@ -329,7 +358,8 @@
             "value": "%@…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Last Filter: %@": {
       "extractionState": "manual",
@@ -340,7 +370,8 @@
             "value": "上次滤镜：%@"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Delete %@": {
       "extractionState": "manual",
@@ -351,7 +382,8 @@
             "value": "删除%@"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "%@ effect": {
       "extractionState": "manual",
@@ -362,7 +394,8 @@
             "value": "%@效果"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "%@ Selection": {
       "extractionState": "manual",
@@ -373,7 +406,8 @@
             "value": "%@选区"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Align %@": {
       "extractionState": "manual",
@@ -384,7 +418,8 @@
             "value": "对齐%@"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "What fills the %@ channel: a layer or group read as grayscale, or solid black or white": {
       "extractionState": "manual",
@@ -395,9 +430,9 @@
             "value": "填充%@通道的内容：以灰度读取的图层或组，或纯黑、纯白"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
-
     "100%": {
       "extractionState": "manual",
       "localizations": {
@@ -407,7 +442,8 @@
             "value": "100%"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Add Light": {
       "extractionState": "manual",
@@ -418,7 +454,8 @@
             "value": "添加光源"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Align": {
       "extractionState": "manual",
@@ -429,7 +466,8 @@
             "value": "对齐"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Both Ways": {
       "extractionState": "manual",
@@ -440,7 +478,8 @@
             "value": "双向"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Camera Raw…": {
       "extractionState": "manual",
@@ -451,7 +490,8 @@
             "value": "Camera Raw…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Cap": {
       "extractionState": "manual",
@@ -462,7 +502,8 @@
             "value": "端点"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Choose the light's color": {
       "extractionState": "manual",
@@ -473,7 +514,8 @@
             "value": "选择光源颜色"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Choose this light's color": {
       "extractionState": "manual",
@@ -484,7 +526,8 @@
             "value": "选择此光源的颜色"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Clear All": {
       "extractionState": "manual",
@@ -495,7 +538,8 @@
             "value": "全部清除"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Click or drag on the canvas to move the center": {
       "extractionState": "manual",
@@ -506,7 +550,8 @@
             "value": "在画布上单击或拖动以移动中心"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Click or drag on the canvas to move the light": {
       "extractionState": "manual",
@@ -517,7 +562,8 @@
             "value": "在画布上单击或拖动以移动光源"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Close the filter and add the depth the haze goes by as a new layer: white is near, black is far": {
       "extractionState": "manual",
@@ -528,7 +574,8 @@
             "value": "关闭滤镜并把雾霭所依据的深度作为新图层添加：白色为近，黑色为远"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Copies to one side of the picture, or out to both": {
       "extractionState": "manual",
@@ -539,7 +586,8 @@
             "value": "朝画面一侧复制，或向两侧展开"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Custom ratio": {
       "extractionState": "manual",
@@ -550,7 +598,8 @@
             "value": "自定义比例"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Custom…": {
       "extractionState": "manual",
@@ -561,7 +610,8 @@
             "value": "自定义…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Delete Frame": {
       "extractionState": "manual",
@@ -572,7 +622,8 @@
             "value": "删除帧"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Direction": {
       "extractionState": "manual",
@@ -583,7 +634,8 @@
             "value": "方向"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Distances": {
       "extractionState": "manual",
@@ -594,7 +646,8 @@
             "value": "距离"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Distribute": {
       "extractionState": "manual",
@@ -605,7 +658,8 @@
             "value": "分布"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Duplicate Frame": {
       "extractionState": "manual",
@@ -616,7 +670,8 @@
             "value": "复制帧"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Effect": {
       "extractionState": "manual",
@@ -627,7 +682,8 @@
             "value": "效果"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Enabled masks apply here, as on the canvas. Drag or scroll to move around; double-click switches between Fit and 100%.": {
       "extractionState": "manual",
@@ -638,7 +694,8 @@
             "value": "已启用的蒙版与画布上一致地在此生效。拖动或滚轮可平移；双击在“适合窗口”和 100% 之间切换。"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Enter a positive ratio within the document size limits.": {
       "extractionState": "manual",
@@ -649,7 +706,8 @@
             "value": "请输入文档尺寸范围内的正数比例。"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Extract Depth": {
       "extractionState": "manual",
@@ -660,7 +718,8 @@
             "value": "提取深度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Fill color": {
       "extractionState": "manual",
@@ -671,7 +730,8 @@
             "value": "填充颜色"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Filter the layer list": {
       "extractionState": "manual",
@@ -682,7 +742,8 @@
             "value": "筛选图层列表"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Finding the subject…": {
       "extractionState": "manual",
@@ -693,7 +754,8 @@
             "value": "正在查找主体…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Forever": {
       "extractionState": "manual",
@@ -704,7 +766,8 @@
             "value": "永久"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Frames": {
       "extractionState": "manual",
@@ -715,7 +778,8 @@
             "value": "帧"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Getting depth…": {
       "extractionState": "manual",
@@ -726,7 +790,8 @@
             "value": "正在获取深度…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "GIF keeps fully transparent or opaque pixels; soft edges use a 50% threshold.": {
       "extractionState": "manual",
@@ -737,7 +802,8 @@
             "value": "GIF 会保留完全透明或不透明的像素；柔边按 50% 阈值处理。"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How big the light is": {
       "extractionState": "manual",
@@ -748,7 +814,8 @@
             "value": "光源的大小"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How bright a light has to be to flare; near 100, only the biggest, brightest spots": {
       "extractionState": "manual",
@@ -759,7 +826,8 @@
             "value": "光源要多亮才会形成光斑；接近 100 时只有最大最亮的光点才会出现"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How bright a light has to be to sparkle; near 100, only the biggest, brightest spots": {
       "extractionState": "manual",
@@ -770,7 +838,8 @@
             "value": "光源要多亮才会闪耀；接近 100 时只有最大最亮的光点才会闪耀"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How bright the beams are": {
       "extractionState": "manual",
@@ -781,7 +850,8 @@
             "value": "光束的亮度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How brightly lights open into discs": {
       "extractionState": "manual",
@@ -792,7 +862,8 @@
             "value": "光点散成圆盘的亮度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far apart the copies are": {
       "extractionState": "manual",
@@ -803,7 +874,8 @@
             "value": "副本之间的间距"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far from the light the beams reach": {
       "extractionState": "manual",
@@ -814,7 +886,8 @@
             "value": "光束从光源伸出的距离"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far into the scene the haze begins: low reaches up to the camera, high leaves all but the farthest parts clear": {
       "extractionState": "manual",
@@ -825,7 +898,8 @@
             "value": "雾霭从多深处开始：低值一直延伸到镜头前，高值只让最远处的部分蒙雾"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far out of focus: the size of each disc": {
       "extractionState": "manual",
@@ -836,7 +910,8 @@
             "value": "散焦的程度：每个圆盘的大小"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the colors spread apart, red one way and blue the other": {
       "extractionState": "manual",
@@ -847,7 +922,8 @@
             "value": "颜色的分离程度，红色偏向一侧、蓝色偏向另一侧"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the lens's coatings turn each streak blue along its length; none keeps the light's own color": {
       "extractionState": "manual",
@@ -858,7 +934,8 @@
             "value": "镜头镀膜使每条光带沿长度方向偏蓝的程度；设为无则保留光源本身的颜色"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the light spreads": {
       "extractionState": "manual",
@@ -869,7 +946,8 @@
             "value": "光的扩散范围"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the light wraps around the subject's edges": {
       "extractionState": "manual",
@@ -880,7 +958,8 @@
             "value": "光环绕主体边缘的范围"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the spikes reach": {
       "extractionState": "manual",
@@ -891,7 +970,8 @@
             "value": "星芒的伸展长度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How far the streaks reach across the picture": {
       "extractionState": "manual",
@@ -902,7 +982,8 @@
             "value": "光带在画面中横跨的范围"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How fine the detail it sharpens: small for crisp texture, larger for a punchier look": {
       "extractionState": "manual",
@@ -913,7 +994,8 @@
             "value": "锐化的细节尺度：小值保留清晰质感，大值更强烈"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How long each frame shows": {
       "extractionState": "manual",
@@ -924,7 +1006,8 @@
             "value": "每帧的显示时长"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How many spikes each light has, as the lens's aperture blades make them": {
       "extractionState": "manual",
@@ -935,7 +1018,8 @@
             "value": "每个光源的星芒数量，如同镜头光圈叶片形成的那样"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How many times the picture echoes, each fainter": {
       "extractionState": "manual",
@@ -946,7 +1030,8 @@
             "value": "画面的重影次数，每次更淡"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How much colored speckle is smoothed into the colors around it": {
       "extractionState": "manual",
@@ -957,7 +1042,8 @@
             "value": "彩色斑点被平滑进周围颜色的程度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How much fine texture and edges are kept while the grain is smoothed": {
       "extractionState": "manual",
@@ -968,7 +1054,8 @@
             "value": "平滑颗粒时保留多少细节纹理与边缘"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How much grain is smoothed from the picture's brightness": {
       "extractionState": "manual",
@@ -979,7 +1066,8 @@
             "value": "从画面亮度中平滑掉多少颗粒"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How much light scatters: a soft halo around bright areas, and gently lifted shadows": {
       "extractionState": "manual",
@@ -990,7 +1078,8 @@
             "value": "光的散射程度：亮部周围形成柔和光晕，暗部被轻轻提亮"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How much the beams break up into separate shafts": {
       "extractionState": "manual",
@@ -1001,7 +1090,8 @@
             "value": "光束分裂成独立光柱的程度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How strongly edges and fine detail are brought out": {
       "extractionState": "manual",
@@ -1012,7 +1102,8 @@
             "value": "边缘与细节被强化的程度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How the light ends on the inside: low feathers it off softly from the edge, high holds it bright and ends it crisply": {
       "extractionState": "manual",
@@ -1023,7 +1114,8 @@
             "value": "光在内侧的收尾方式：低值从边缘柔和过渡，高值保持明亮并干脆收束"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How the line's ends, and each of its dashes and dots, are finished": {
       "extractionState": "manual",
@@ -1034,7 +1126,8 @@
             "value": "线条两端以及每个虚线段和点的收尾方式"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "How thick the air is: haze lit by the light, thinner in front of the subject": {
       "extractionState": "manual",
@@ -1045,7 +1138,8 @@
             "value": "空气的浓稠度：被光照亮的雾霭，主体前方更稀薄"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Import, then open the Camera Raw Filter": {
       "extractionState": "manual",
@@ -1056,7 +1150,8 @@
             "value": "导入后打开 Camera Raw 滤镜"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Import…": {
       "extractionState": "manual",
@@ -1067,7 +1162,8 @@
             "value": "导入…"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Keep Subject Clear": {
       "extractionState": "manual",
@@ -1078,7 +1174,8 @@
             "value": "保持主体清晰"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Keep the subject clear of the haze; off, it's hazed by its own distance, so a figure far off is misted": {
       "extractionState": "manual",
@@ -1089,7 +1186,8 @@
             "value": "让主体不受雾霭影响；关闭时主体按自身距离受雾，远处的人物会显得朦胧"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Keep transparent areas": {
       "extractionState": "manual",
@@ -1100,7 +1198,8 @@
             "value": "保留透明区域"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Let the lights glow in the air around the subject, blending them into the background": {
       "extractionState": "manual",
@@ -1111,7 +1210,8 @@
             "value": "让光在主体周围的空气中晕开，并融入背景"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Light gathered at each disc's rim, as some lenses draw it": {
       "extractionState": "manual",
@@ -1122,7 +1222,8 @@
             "value": "光聚集在每个圆盘边缘，如同某些镜头的成像"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Light the subject from another side as well": {
       "extractionState": "manual",
@@ -1133,7 +1234,8 @@
             "value": "从另一侧也为主体打光"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Line layers up with each other, the selection, or the canvas when one is selected": {
       "extractionState": "manual",
@@ -1144,7 +1246,8 @@
             "value": "让图层相互对齐，或与选区、选中时的画布对齐"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Linear splits along one direction; Radial splits outwards from a center, sharp there": {
       "extractionState": "manual",
@@ -1155,7 +1258,8 @@
             "value": "线性沿一个方向分离；径向从中心向外扩散，中心处更锐利"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Loop": {
       "extractionState": "manual",
@@ -1166,7 +1270,8 @@
             "value": "循环"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "New filter layer": {
       "extractionState": "manual",
@@ -1177,7 +1282,8 @@
             "value": "新建滤镜图层"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Once": {
       "extractionState": "manual",
@@ -1188,7 +1294,8 @@
             "value": "一次"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "One Way": {
       "extractionState": "manual",
@@ -1199,7 +1306,8 @@
             "value": "单向"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Pen pressure sets the opacity: a light touch paints fainter, up to the brush’s Opacity": {
       "extractionState": "manual",
@@ -1210,7 +1318,8 @@
             "value": "压感控制不透明度：轻触绘制更淡，最高到画笔的不透明度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Pen pressure sets the size: a light touch paints a thinner line": {
       "extractionState": "manual",
@@ -1221,7 +1330,8 @@
             "value": "压感控制大小：轻触绘制更细的线条"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Points": {
       "extractionState": "manual",
@@ -1232,7 +1342,8 @@
             "value": "点"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Pressure for opacity": {
       "extractionState": "manual",
@@ -1243,7 +1354,8 @@
             "value": "压感控制不透明度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Pressure for size": {
       "extractionState": "manual",
@@ -1254,7 +1366,8 @@
             "value": "压感控制大小"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Remove this light": {
       "extractionState": "manual",
@@ -1265,7 +1378,8 @@
             "value": "移除此光源"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Show Extras": {
       "extractionState": "manual",
@@ -1276,7 +1390,8 @@
             "value": "显示额外内容"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Show only some kinds of layer": {
       "extractionState": "manual",
@@ -1287,7 +1402,8 @@
             "value": "仅显示部分类型的图层"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Smear the split into streaks along its direction": {
       "extractionState": "manual",
@@ -1298,7 +1414,8 @@
             "value": "把分离沿其方向涂抹成条带"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Smooth Corners": {
       "extractionState": "manual",
@@ -1309,7 +1426,8 @@
             "value": "平滑拐角"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Soften the copies, more the farther they're pushed": {
       "extractionState": "manual",
@@ -1320,7 +1438,8 @@
             "value": "柔化副本，推得越远越柔"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Solid, dashed or dotted; dashes grow with the line's width": {
       "extractionState": "manual",
@@ -1331,7 +1450,8 @@
             "value": "实线、虚线或点线；虚线随线宽增大"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Split each copy's red and blue apart, as glass does; 0 keeps the copies crisp": {
       "extractionState": "manual",
@@ -1342,7 +1462,8 @@
             "value": "像玻璃那样分离每个副本的红蓝通道；0 保持副本清晰"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Split the layer's original channels into four grayscale layers, Red, Green, Blue and Alpha, for Export As › Channel Pack. Color under fully transparent pixels can't be recovered": {
       "extractionState": "manual",
@@ -1353,7 +1474,8 @@
             "value": "把图层的原始通道拆成红、绿、蓝、Alpha 四个灰度图层，供“导出为 › 通道打包”使用。完全透明像素下的颜色无法恢复"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Split to Layers": {
       "extractionState": "manual",
@@ -1364,7 +1486,8 @@
             "value": "拆分到图层"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Spread out depths bunched together, such as a distant city, so the haze builds through them in steps; 0 keeps the depth as the model sees it": {
       "extractionState": "manual",
@@ -1375,7 +1498,8 @@
             "value": "拉开挤在一起的深度，例如远处的城市，让雾霭在其中逐层累积；0 保持模型所见的深度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "The aperture's shape: round wide open, a hexagon of blades, an anamorphic oval, or a cat's eye toward the edges": {
       "extractionState": "manual",
@@ -1386,7 +1510,8 @@
             "value": "光圈形状：全开时为圆形、多叶片形成的六边形、变形宽银幕式的椭圆，或靠近边缘呈猫眼形"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Transparency": {
       "extractionState": "manual",
@@ -1397,7 +1522,8 @@
             "value": "透明度"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Where the light comes from, behind the subject: 0° from the right, 90° from above": {
       "extractionState": "manual",
@@ -1408,7 +1534,8 @@
             "value": "光源从主体后方何处照来：0° 来自右侧，90° 来自上方"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Which way the colors spread": {
       "extractionState": "manual",
@@ -1419,7 +1546,8 @@
             "value": "颜色扩散的方向"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Which way the copies step": {
       "extractionState": "manual",
@@ -1430,7 +1558,8 @@
             "value": "副本偏移的方向"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Width:Height": {
       "extractionState": "manual",
@@ -1441,7 +1570,8 @@
             "value": "宽:高"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
     "Width:height, such as 4:5 or 3:2": {
       "extractionState": "manual",
@@ -1452,9 +1582,9 @@
             "value": "宽:高比例，例如 4:5 或 3:2"
           }
         }
-      }
+      },
+      "generatesSymbol": false
     },
-
     " Selection": {
       "extractionState": "manual",
       "localizations": {
