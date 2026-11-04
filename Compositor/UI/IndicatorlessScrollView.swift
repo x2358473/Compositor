@@ -16,9 +16,6 @@ struct IndicatorlessScrollView<Content: View>: NSViewRepresentable {
         view.updateDocumentSize()
     }
 
-    /// Left unoptimized on purpose: with the deployment target at 15, the early inliner of the Swift 6.3
-    /// compiler crashes while optimizing this class's synthesized `deinit` (the EarlyPerfInliner pass).
-    @_optimize(none)
     final class Container: NSScrollView {
         let host: NSHostingView<Content>
 
@@ -35,6 +32,11 @@ struct IndicatorlessScrollView<Content: View>: NSViewRepresentable {
         }
 
         required init?(coder: NSCoder) { nil }
+
+        /// Left empty and unoptimized on purpose: with the deployment target at 15, the early inliner of the
+        /// Swift 6.3 compiler crashes while optimizing this class's synthesized deinit (EarlyPerfInliner).
+        @_optimize(none)
+        deinit {}
 
         override func layout() {
             super.layout()
