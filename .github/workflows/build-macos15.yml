@@ -68,30 +68,20 @@ jobs:
           tail -60 build.log
           exit $STATUS
 
-      # Without a token the log is readable only here: part of it goes into the check run's output and
-      # the first error into the artifact's name, both of which are public on a public repository.
-      - name: Publish the build log
+      # A private repository hides a job's log behind a token; an artifact's name does not, so the first
+      # error the build reported goes into it.
+      - name: Upload build log
         if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            const log = fs.readFileSync('build.log', 'utf8')
-            await github.rest.checks.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              check_run_id: Number(context.job),
-              output: {
-                title: 'xcodebuild log',
-                summary: '```\n' + log.slice(-60000) + '\n```'
-              }
-            })
+        run: |
+          NAME=$(grep -m1 "error:" build.log | tr '/:' '__' | tr -cd 'A-Za-z0-9 ._,()[]=-' | cut -c1-120)
+          if [ -z "$NAME" ]; then NAME=$(tail -1 build.log | tr '/:' '__' | tr -cd 'A-Za-z0-9 ._,()[]=-' | cut -c1-120); fi
+          echo "LOG_NAME=${NAME:-build-log}" >> "$GITHUB_ENV"
 
       - name: Upload build log
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: build-log
+          name: ${{ env.LOG_NAME || 'build-log' }}
           path: build.log
           retention-days: 7
 

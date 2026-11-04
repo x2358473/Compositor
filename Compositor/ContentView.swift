@@ -221,29 +221,17 @@ struct ContentView: View {
                     .disabled(session.isImporting || session.showsBusy || session.levels != nil)
                     .modifier(NewProjectDropTarget(workspace: applicationDelegate?.workspace))
             }
-            // ToolbarSpacer and a toolbar item's hidden background are macOS 26. On macOS 15 plain items
-            // hold the same places, so the tabs and the zoom controls sit where they always did.
-            if #available(macOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .navigation)
-            } else {
-                ToolbarItem(placement: .navigation) {
-                    Color.clear.frame(width: 8, height: 1).accessibilityHidden(true)
-                }
+            // ToolbarSpacer and a toolbar item's hidden background are macOS 26. Spacer items hold the same
+            // places on macOS 15, and the background a shared one draws is a style, not a behavior.
+            ToolbarItem(placement: .navigation) {
+                Color.clear.frame(width: 8, height: 1).accessibilityHidden(true)
             }
             if let workspace = applicationDelegate?.workspace {
-                if #available(macOS 26.0, *) {
-                    projectTabStripItem(workspace).sharedBackgroundVisibility(.hidden)
-                } else {
-                    projectTabStripItem(workspace)
-                }
+                projectTabStripItem(workspace)
             }
             // Absorb all remaining navigation-toolbar width before the zoom controls.
             // Without this spacer, the growing tab strip pushes the primary actions left.
-            if #available(macOS 26.0, *) {
-                ToolbarSpacer(.flexible, placement: .navigation)
-            } else {
-                ToolbarItem(placement: .navigation) { Spacer() }
-            }
+            ToolbarItem(placement: .navigation) { Spacer() }
             ToolbarItem(placement: .primaryAction) {
                 Button("Fit") { session.fit() }.help("Fit canvas in window (⌘0)")
                     .accessibilityIdentifier("fitCanvas").disabled(session.document == nil)
