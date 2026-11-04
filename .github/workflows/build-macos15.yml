@@ -85,6 +85,19 @@ jobs:
           path: build.log
           retention-days: 7
 
+      # The branch is not one the workflow runs on, so this cannot start another run; it is where the
+      # errors are read from while iterating on the deployment target.
+      - name: Record the build errors
+        if: failure()
+        run: |
+          grep -E "error:" build.log | head -200 > build-errors.txt || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B ci-log
+          git add -f build-errors.txt
+          git commit -m "Record the macOS 15 build errors" --allow-empty
+          git push -f origin ci-log
+
       - name: Sign the app
         run: |
           APP=DerivedData/Build/Products/Release/Compositor.app
