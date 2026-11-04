@@ -91,19 +91,21 @@ jobs:
         if: failure()
         run: |
           {
+            echo "=== crash context ==="
+            grep -n -B 40 "Failed frontend command" build.log | head -60 || true
+            echo
             echo "=== error lines ==="
             grep -n -E "error:" build.log | head -100 || true
             echo
-            echo "=== failure lines ==="
-            grep -n -i -E "fatal|failed|unable to|cannot|not found" build.log | head -150 || true
-            echo
-            echo "=== last 40 lines ==="
-            tail -40 build.log
+            echo "=== last 20 lines ==="
+            tail -20 build.log
           } > build-errors.txt
+          # The whole log, for when the excerpt above is not enough.
+          cp build.log build-log-full.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B ci-log
-          git add -f build-errors.txt
+          git add -f build-errors.txt build-log-full.txt
           git commit -m "Record the macOS 15 build errors" --allow-empty
           git push -f origin ci-log
 
