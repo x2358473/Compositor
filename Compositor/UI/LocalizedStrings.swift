@@ -14,6 +14,12 @@ extension String {
     }
 }
 
+extension LocalizedStringKey {
+    /// A title that is already a key passes through: callers take either a literal or a string, and
+    /// both reach `Text(title.localizedKey)`.
+    var localizedKey: LocalizedStringKey { self }
+}
+
 extension NSMenuItem {
     /// A menu item whose title is held in a string rather than written at the call, which
     /// `NSMenuItem(title:)` would show untranslated.
