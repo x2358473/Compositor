@@ -27,9 +27,9 @@ import Sparkle
             : "\(name) \(appcastItem.displayVersionString) is now available — you have \(current). Would you like to download it now?"
         // Always set, even with nothing listed, so the alert is the same width every time.
         alert.accessoryView = Self.list(Self.changes(in: appcastItem))
-        alert.addButton(withTitle: downloaded ? "Install and Relaunch" : "Install Update")
-        alert.addButton(withTitle: "Remind Me Later")
-        alert.addButton(withTitle: "Skip This Version")
+        alert.addButton(withTitle: (downloaded ? "Install and Relaunch" : "Install Update").localized)
+        alert.addButton(withTitle: NSLocalizedString("Remind Me Later", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Skip This Version", comment: ""))
         if let updater, updater.allowsAutomaticUpdates {
             alert.showsSuppressionButton = true
             alert.suppressionButton?.title = "Automatically download and install updates in the future"

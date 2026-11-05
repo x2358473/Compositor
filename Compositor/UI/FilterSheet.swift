@@ -391,7 +391,7 @@ struct FilterSheet: View {
                 .contentShape(shape)
         }
         .buttonStyle(.plain)
-        .help(help)
+        .help(help.localizedKey)
     }
 
     /// Lens Effects: which effect, then its own settings.
@@ -586,7 +586,7 @@ struct FilterSheet: View {
         let step = pow(10, Double(decimals))
         let reset = { update { $0 = Self.resetting(key, in: $0) } }
         return HStack(spacing: 10) {
-            Text(title).fixedSize()
+            Text(title.localizedKey).fixedSize()
                 .background(GeometryReader { Color.clear.preference(key: LabelWidthKey.self, value: $0.size.width) })
                 .frame(width: labelWidth, alignment: .leading)
                 .onTapGesture(count: 2) { if track != nil { reset() } }
@@ -651,7 +651,7 @@ struct GradientMapControls: View {
             .buttonStyle(.plain)
             .help("Choose the \(title.lowercased()) color")
             .accessibilityLabel("\(title) color")
-            Text(title)
+            Text(title.localizedKey)
         }
     }
 }

@@ -101,8 +101,8 @@ final class ProjectController {
                 let alert = NSAlert()
                 alert.messageText = existing.count == 1 ? "“\(existing[0].lastPathComponent)” already exists. Replace it?"
                     : "\(existing.count) of these files already exist in “\(url.lastPathComponent)”. Replace them?"
-                alert.addButton(withTitle: "Replace")
-                alert.addButton(withTitle: "Cancel")
+                alert.addButton(withTitle: NSLocalizedString("Replace", comment: ""))
+                alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
                 guard await show(alert) == .alertFirstButtonReturn else { return }
             }
         }
@@ -121,7 +121,7 @@ final class ProjectController {
             let alert = NSAlert()
             alert.messageText = empty.count == 1 ? "“\(empty[0])” has nothing to export" : "\(empty.count) layers have nothing to export"
             alert.informativeText = "A layer with no visible pixels, such as an adjustment layer, isn’t saved as a PNG."
-            alert.addButton(withTitle: "OK")
+            alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
             _ = await show(alert)
         }
     }
@@ -430,9 +430,9 @@ final class ProjectController {
         let alert = NSAlert()
         alert.messageText = "Save changes to \(session.projectURL?.lastPathComponent ?? "Untitled")?"
         alert.informativeText = "Your changes will be lost if you don’t save them."
-        alert.addButton(withTitle: "Save")
-        alert.addButton(withTitle: "Cancel")
-        alert.addButton(withTitle: "Don’t Save")
+        alert.addButton(withTitle: NSLocalizedString("Save", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Don’t Save", comment: ""))
         let response = await show(alert)
         if response == .alertFirstButtonReturn { return await saveCurrent() }
         return response == .alertThirdButtonReturn
@@ -443,7 +443,7 @@ final class ProjectController {
         alert.alertStyle = .warning
         alert.messageText = title
         alert.informativeText = error.localizedDescription
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
         _ = await show(alert)
     }
 

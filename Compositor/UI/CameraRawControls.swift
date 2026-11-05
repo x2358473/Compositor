@@ -340,9 +340,9 @@ struct CameraRawControls: View {
                         reset resetValue: Double = 0, help: String) -> some View {
         let step = pow(10, Double(decimals))
         return HStack(spacing: 10) {
-            Text(title)
+            Text(title.localizedKey)
                 .frame(minWidth: Self.labelWidth, alignment: .leading)
-                .help(help)
+                .help(help.localizedKey)
                 .onTapGesture(count: 2) { reset(key, to: resetValue) }
                 .scrubbable(sensitivity: 1 / step,
                             value: Binding(get: { raw[keyPath: key] }, set: { assign(key, $0, clipping: nil) }),
@@ -353,7 +353,7 @@ struct CameraRawControls: View {
             TextField(title, value: Binding(get: { raw[keyPath: key] }, set: { assign(key, $0, clipping: nil) }),
                       format: .number.precision(.fractionLength(0...decimals)))
                 .frame(width: 56).textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing)
-                .help(help)
+                .help(help.localizedKey)
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(title)

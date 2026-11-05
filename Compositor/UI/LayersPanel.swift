@@ -57,7 +57,7 @@ private struct LayersUnavailableView<Content: View>: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: systemImage).font(.system(size: 25, weight: .light))
-            Text(title).font(.callout.weight(.medium))
+            Text(title.localizedKey).font(.callout.weight(.medium))
             content()
                 .font(.caption).multilineTextAlignment(.center)
         }

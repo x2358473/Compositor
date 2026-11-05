@@ -204,6 +204,6 @@ private struct AlignButton: View {
         Button(action: action) {
             Image(systemName: symbol).font(.system(size: 15)).frame(width: 30, height: 28).contentShape(Rectangle())
         }
-        .buttonStyle(.borderless).help(title).accessibilityLabel(title)
+        .buttonStyle(.borderless).help(title.localizedKey).accessibilityLabel(title)
     }
 }

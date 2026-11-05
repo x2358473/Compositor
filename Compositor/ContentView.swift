@@ -353,7 +353,8 @@ struct ContentView: View {
                     .frame(width: 62, alignment: .leading).accessibilityIdentifier("zoomStatus")
                 Text("\(document.width) × \(document.height) px").accessibilityIdentifier("canvasDimensions")
                 if let draft = session.shapeDraft, let size = session.dragOutSize {
-                    Text("\(draft.kind == .line ? "Line" : "Shape") \(size.text)").accessibilityIdentifier("shapeDimensions")
+                    Text((draft.kind == .line ? "Line %@" : "Shape %@").localizedFormat(size.text))
+                    .accessibilityIdentifier("shapeDimensions")
                 } else if let size = session.selectionSize {
                     Text("Selection \(size.width) × \(size.height) px").accessibilityIdentifier("selectionDimensions")
                 }

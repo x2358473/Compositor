@@ -1,6 +1,103 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Line %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直线 %@"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Shape %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "形状 %@"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Selection %lf × %lf px": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选区 %lf × %lf px"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Light %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光源 %lld"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Frame %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 帧"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "%@ · Original": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 原始"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Select text: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择文本：%@"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Select image: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择图像：%@"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+
 
     "Alpha": {
       "extractionState": "manual",

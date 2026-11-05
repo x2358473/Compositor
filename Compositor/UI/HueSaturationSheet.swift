@@ -126,7 +126,7 @@ struct HueSaturationSheet: View {
     private func slider(_ title: String, value: Binding<Double>, range: ClosedRange<Double>, unit: String,
                         track: CameraRawSliderTrack, reset: Double) -> some View {
         HStack(spacing: 10) {
-            Text(title).frame(width: 76, alignment: .leading)
+            Text(title.localizedKey).frame(width: 76, alignment: .leading)
                 .onTapGesture(count: 2) { value.wrappedValue = reset }
                 .scrubbable(sensitivity: 1, value: value, range: range)
             CameraRawSlider(value: value.wrappedValue, range: range, track: track, help: "\(title). Double-click to reset.",
