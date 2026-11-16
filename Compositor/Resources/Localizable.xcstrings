@@ -1,6 +1,67 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Current color": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前颜色"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "How many pixels to expand, contract or feather the selection by": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扩展、收缩或羽化选区的像素数"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Reset colors to black and white (D)": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将颜色重置为黑白 (D)"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Smooth edges; turn off for hard pixel edges, like a pencil": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平滑边缘；关闭后可得到像铅笔一样的硬像素边缘"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "The color before: click to go back to it": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "之前的颜色：点击可返回"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+
     "Line %@": {
       "extractionState": "manual",
       "localizations": {
