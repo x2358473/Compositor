@@ -1,6 +1,67 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Color Picker (Fill Color)": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾色器（填充色）"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Color Picker (Stroke Color)": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾色器（描边色）"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Color Picker (Light %@)": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾色器（光源 %@）"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Stroke color": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "描边颜色"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+    "Stroke drawn inside the shape, in pixels. 0 draws none": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在形状内部绘制的描边，单位为像素。0 表示不描边"
+          }
+        }
+      },
+      "generatesSymbol": false
+    },
+
     "Current color": {
       "extractionState": "manual",
       "localizations": {

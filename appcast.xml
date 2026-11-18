@@ -3,16 +3,16 @@
   <channel>
     <title>Compositor</title>
     <item>
-      <title>Version 1.6.7</title>
-      <pubDate>Sun, 15 Nov 2026 05:18:20 +0000</pubDate>
-      <sparkle:version>66</sparkle:version>
-      <sparkle:shortVersionString>1.6.7</sparkle:shortVersionString>
+      <title>Version 1.6.11</title>
+      <pubDate>Tue, 17 Nov 2026 20:04:30 +0000</pubDate>
+      <sparkle:version>70</sparkle:version>
+      <sparkle:shortVersionString>1.6.11</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-      <link>https://github.com/robbietilton/Compositor/releases/tag/v1.6.7</link>
-      <changes><![CDATA[Turn off Anti-alias on the Brush for hard pixel edges, like a pencil, to paint or erase
-The Brush bar no longer repeats the foreground color, which stays in the tool rail
-Fixed Option-scroll zoom going the wrong way with natural scrolling turned off]]></changes>
-      <enclosure url="https://github.com/robbietilton/Compositor/releases/download/v1.6.7/Compositor.dmg" sparkle:edSignature="ltjAXbXIk9QsFS+PCBpYLnqOAAOH0RhJe90m950tVHX9aBEXYImcBtes6po0vrnU87CryRsCSlAXpwYLTLM/BA==" length="8867141" type="application/octet-stream"/>
+      <link>https://github.com/robbietilton/Compositor/releases/tag/v1.6.11</link>
+      <changes><![CDATA[Pasting while a folder is selected now puts the layer above the folder, not inside it
+New layers added between clipped layers are clipped too
+When dragging a layer to the top of a group of clipped layers, drop it a little higher to leave it unclipped, or a little lower to clip it]]></changes>
+      <enclosure url="https://github.com/robbietilton/Compositor/releases/download/v1.6.11/Compositor.dmg" sparkle:edSignature="Xvg6TiK4kfX/V9/jTPsF6h5ak9sgpN4uTn8zEvupxpLxjkOXvnJx8rrryST0HrnSwp5/CKG7XQVGP/KWeGRzDw==" length="8882559" type="application/octet-stream"/>
     </item>
   </channel>
 </rss>
