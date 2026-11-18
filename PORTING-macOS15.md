@@ -6,7 +6,7 @@
 2. 带 **简体中文** 界面
 3. 用 GitHub Actions 自动构建 **arm64** 包并发布 Release
 
-基线是上游 `1.6.7`（commit `08975ba`）。改动相对上游很小，目的是每次跟进上游时合并成本最低。
+基线是上游 `1.6.12`（commit `72b71b2`）。改动相对上游很小，目的是每次跟进上游时合并成本最低。
 
 ---
 
@@ -125,7 +125,7 @@ While running pass "EarlyPerfInliner" on SILFunction
 
 生效原理：SwiftUI 的 `Text("…")`、`Button("…")`、`Label("…")`、`.help("…")`、`.accessibilityLabel("…")` 参数都是 `LocalizedStringKey`，只要 catalog 里有对应条目就显示中文，**不用改源码**。资源文件放 `Compositor/Resources/` 会被自动纳入构建（工程用的是 `PBXFileSystemSynchronizedRootGroup`），不需要改 build phase。
 
-当前覆盖：上游 1.6.7 源码里 560 个唯一字符串 key，覆盖 555 个（99%）。缺口是 5 个纯符号（`#`、`%`、`×`、`…`）——它们本身无需翻译；带插值的文案已按 `%lld` / `%lf` / `%@` 模板补进 catalog。catalog 共 1449 条。
+当前覆盖：上游 1.6.12 源码里 558 个唯一字符串 key，覆盖 553 个（99%）。缺口是 5 个纯符号（`#`、`%`、`×`、`…`）——它们本身无需翻译；带插值的文案已按 `%lld` / `%lf` / `%@` 模板补进 catalog。catalog 共 1454 条。
 
 **仍然显示英文的地方**（设计内保留）：
 
